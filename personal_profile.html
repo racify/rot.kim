@@ -1,0 +1,2492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#050505" />
+  <title>zack</title>
+  <link id="dynamic-favicon" rel="icon" href="favicon.png" type="image/png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://api.lanyard.rest" crossorigin />
+  <link rel="preconnect" href="https://dcdn.dstn.to" crossorigin />
+  <link rel="preconnect" href="https://ws.audioscrobbler.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.discordapp.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://i.scdn.co" crossorigin />
+  <link rel="preconnect" href="https://itunes.apple.com" crossorigin />
+
+  <script>
+    const DISCORD_ID = "488047218138546179";
+    const CLOUD_INVITE = "2rYtaG23ht";
+    const LASTFM_API_KEY = "56f986f70954d1ad8c8b3ec3aec33f83";
+    const LASTFM_USERNAME = "renumerate";
+    const BG_MEDIA_URL = "bg.png"; // Supports .png, .jpg, .jpeg, .webp, .gif, .avif, .svg, .mp4, .webm, .ogg, .mov
+    const BG_FALLBACK_CANDIDATES = [
+      "bg.png",
+      "bg.jpg",
+      "bg.jpeg",
+      "bg.webp",
+      "bg.gif",
+      "bg.avif",
+      "background.png",
+      "background.jpg",
+      "background.webp",
+      "background.mp4"
+    ];
+    const CACHE_KEY = "zack_cache_v15";
+    const BOOT_MIN_MS = 140;
+    const BOOT_START = performance.now();
+
+    const fetchJson = async (url, noStore = false, timeoutMs = 4500, extSignal = null) => {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+      const onExtAbort = () => ctrl.abort();
+      if (extSignal) {
+        if (extSignal.aborted) {
+          clearTimeout(timer);
+          return null;
+        }
+        extSignal.addEventListener("abort", onExtAbort, { once: true });
+      }
+      try {
+        const res = await fetch(url, {
+          cache: noStore ? "no-store" : "default",
+          signal: ctrl.signal
+        });
+        return res.ok ? await res.json() : null;
+      } catch {
+        return null;
+      } finally {
+        clearTimeout(timer);
+        if (extSignal) extSignal.removeEventListener("abort", onExtAbort);
+      }
+    };
+
+    const EARLY = {
+      lanyard: fetchJson(`https://api.lanyard.rest/v1/users/${DISCORD_ID}`, true),
+      dstn: fetchJson(`https://dcdn.dstn.to/profile/${DISCORD_ID}`, true),
+      lastfm: fetchJson(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${LASTFM_USERNAME}&api_key=${LASTFM_API_KEY}&format=json&limit=10`, true),
+      invite: fetchJson(`https://discord.com/api/v10/invites/${CLOUD_INVITE}?with_counts=true`)
+    };
+  </script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      /* Onyx Background & Surfaces */
+      --bg: #050505;
+      --surface: rgba(12, 12, 14, 0.74);
+      --surface-glass: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.018) 100%);
+      --border: rgba(255, 255, 255, 0.09);
+      --border-hover: rgba(212, 175, 55, 0.34);
+      --glass-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 0 rgba(255, 255, 255, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+      --glass-gold-highlight: inset 0 1px 0 0 rgba(245, 223, 152, 0.28), inset 0 -1px 0 0 rgba(212, 175, 55, 0.1), inset 0 0 0 1px rgba(212, 175, 55, 0.08);
+      --text-strong: #fafafa;
+      --text-main: #e4e4e7;
+      --text-muted: #8e8e93;
+
+      /* Refined 24K Metallic & Champagne Gold Theme */
+      --accent-deep: #9a7418;
+      --accent-mid: #b68a24;
+      --accent: #d4af37;
+      --accent-rich: #e2be53;
+      --accent-bright: #f5df98;
+      --accent-shimmer: #fff1be;
+      --accent-gradient: linear-gradient(90deg, #9a7418 0%, #d4af37 45%, #f5df98 82%, #fff1be 100%);
+      --accent-border: rgba(212, 175, 55, 0.44);
+      --accent-border-strong: rgba(245, 223, 152, 0.72);
+      --accent-glow: rgba(212, 175, 55, 0.52);
+      --accent-glow-soft: rgba(212, 175, 55, 0.18);
+      --accent-ambient: rgba(212, 175, 55, 0.11);
+
+      --tag-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.085), rgba(212, 175, 55, 0.03));
+      --tag-border: rgba(255, 255, 255, 0.13);
+
+      /* Ultra-Smooth Non-Snappy Easing Curves */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+      --cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M5.25 1.5h1.5v3.75h3.75v1.5H6.75v3.75h-1.5V6.75H1.5v-1.5h3.75V1.5z' fill='%23f5df98'/%3E%3C/svg%3E") 6 6, crosshair;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: text;
+      -webkit-user-select: text;
+      cursor: var(--cursor);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    ::selection {
+      background: rgba(212, 175, 55, 0.28);
+      color: #fff8dc;
+      -webkit-text-fill-color: #fff8dc;
+    }
+
+    img, video, svg, .status-dot, .play-live-pip, .eq-bars {
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    a, button, .clickable {
+      cursor: pointer !important;
+    }
+
+    html, body {
+      min-height: 100vh;
+      width: 100%;
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-optical-sizing: auto;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+      font-size: 14px;
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+      overflow-x: hidden;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 20px;
+      position: relative;
+    }
+
+    /* Fullscreen Onyx Boot Loader with Pulsing Gold-Tinted Dot */
+    #boot-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background-color: #050505;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.72s var(--ease-out), visibility 0.72s var(--ease-out);
+      contain: strict;
+    }
+
+    #boot-loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, var(--accent-shimmer), var(--accent));
+      box-shadow: 0 0 14px rgba(245, 223, 152, 0.75), 0 0 30px rgba(212, 175, 55, 0.45);
+      animation: dotPulse 1.2s var(--ease-in-out) infinite alternate;
+    }
+
+    @keyframes dotPulse {
+      0% { transform: scale(0.72); opacity: 0.35; }
+      100% { transform: scale(1.18); opacity: 1; }
+    }
+
+    /* Background Image / Video — Pure Compositor Layer */
+    .bg-media-wrap {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 1.15s var(--ease-out);
+      contain: strict;
+    }
+
+    .bg-media-wrap.ready {
+      opacity: 1;
+    }
+
+    .bg-media {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: translateZ(0);
+      display: none;
+    }
+
+    .bg-media.active {
+      display: block;
+    }
+
+    .bg-media-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(5, 5, 5, 0.68) 0%, rgba(5, 5, 5, 0.94) 100%);
+    }
+
+    /* Main Container */
+    .page-wrap {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 492px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 21px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.85s var(--ease-out), transform 0.85s var(--ease-out);
+    }
+
+    body.loaded .page-wrap {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 540px) {
+      body { padding: 32px 16px; }
+      .page-wrap { gap: 18px; }
+    }
+
+    /* Profile Header */
+    .profile-top {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      contain: layout style;
+    }
+
+    .profile-identity {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .avatar-wrap {
+      position: relative;
+      width: 70px;
+      height: 70px;
+      flex-shrink: 0;
+    }
+
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--surface);
+      box-shadow: var(--glass-highlight), 0 6px 18px rgba(0, 0, 0, 0.45);
+      display: block;
+      transition: transform 0.65s var(--ease-out), box-shadow 0.65s var(--ease-out);
+    }
+
+    .avatar-wrap:hover .avatar-img {
+      transform: scale(1.025);
+      box-shadow: var(--glass-gold-highlight), 0 8px 22px rgba(0, 0, 0, 0.55), 0 0 18px var(--accent-ambient);
+    }
+
+    .avatar-deco {
+      position: absolute;
+      top: -7px;
+      left: -7px;
+      width: calc(100% + 14px);
+      height: calc(100% + 14px);
+      pointer-events: none;
+      z-index: 2;
+      object-fit: contain;
+    }
+
+    .status-dot {
+      position: absolute;
+      bottom: 1px;
+      right: 1px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 2.5px solid var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
+      transition: transform 0.5s var(--ease-out);
+    }
+
+    .status-dot svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .identity-text {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .display-name {
+      font-size: 21px;
+      font-weight: 600;
+      color: var(--text-strong);
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+      transition: color 0.45s var(--ease-out);
+    }
+
+    .display-name.has-gradient {
+      background: linear-gradient(var(--name-angle, 90deg), var(--color-1, #ffffff), var(--color-2, var(--accent-bright)));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .display-name.has-gradient.animated {
+      background-size: 200% auto;
+      animation: nameGradientMove 5s linear infinite;
+    }
+
+    @keyframes nameGradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .sub-identity {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .handle-copy {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      color: var(--text-muted);
+      font-weight: 400;
+      transition: color 0.48s var(--ease-out);
+    }
+
+    .handle-copy:hover {
+      color: var(--accent-bright);
+    }
+
+    .handle-text {
+      display: inline-block;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition: transform 0.52s var(--ease-out), opacity 0.52s var(--ease-out);
+    }
+
+    .handle-copied {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      color: var(--accent-bright);
+      text-shadow: 0 0 12px var(--accent-glow-soft);
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(calc(-50% + 5px)) scale(0.96);
+      pointer-events: none;
+      transition: transform 0.52s var(--ease-out), opacity 0.52s var(--ease-out);
+    }
+
+    .handle-copy.copied .handle-text {
+      opacity: 0;
+      transform: translateY(-5px) scale(0.96);
+    }
+
+    .handle-copy.copied .handle-copied {
+      opacity: 1;
+      transform: translateY(-50%) scale(1);
+    }
+
+    .clan-tag {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: var(--tag-bg);
+      border: 1px solid var(--tag-border);
+      box-shadow: var(--glass-highlight), 0 4px 12px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(8px) saturate(135%);
+      -webkit-backdrop-filter: blur(8px) saturate(135%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      transition: border-color 0.5s var(--ease-out), box-shadow 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+    }
+
+    .clan-tag:hover {
+      border-color: var(--accent-border);
+      box-shadow: var(--glass-gold-highlight), 0 4px 14px rgba(0, 0, 0, 0.35), 0 0 12px var(--accent-ambient);
+    }
+
+    .clan-tag-icon {
+      width: 12px;
+      height: 12px;
+      object-fit: contain;
+      display: none;
+      flex-shrink: 0;
+    }
+
+    .discord-badges {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .discord-badges:empty { display: none; }
+
+    .discord-badge-icon {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+      display: block;
+      transition: transform 0.52s var(--ease-out), filter 0.52s var(--ease-out);
+    }
+
+    .discord-badge-icon:hover {
+      transform: translateY(-1px) scale(1.08);
+      filter: drop-shadow(0 2px 6px var(--accent-glow-soft));
+    }
+
+    .bio-line {
+      font-size: 14px;
+      color: var(--text-main);
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+      white-space: pre-line;
+      word-break: break-word;
+    }
+
+    .bio-line:empty { display: none; }
+
+    .bio-emoji {
+      width: 16px;
+      height: 16px;
+      vertical-align: -3px;
+      object-fit: contain;
+      display: inline-block;
+    }
+
+    /* Section Blocks */
+    .sec-block {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      contain: layout style;
+    }
+
+    .sec-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      color: var(--text-muted);
+    }
+
+    .sec-head-right {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.48s var(--ease-out), transform 0.48s var(--ease-out);
+    }
+
+    .sec-head-right:hover {
+      color: var(--accent-bright);
+      transform: translateX(1.5px);
+    }
+
+    /* Project Row */
+    .project-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      padding: 2px 0;
+      transition: transform 0.58s var(--ease-out);
+    }
+
+    .project-row:hover {
+      transform: translateX(3.5px);
+    }
+
+    .project-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 9px;
+      object-fit: cover;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--glass-highlight), 0 4px 12px rgba(0, 0, 0, 0.36);
+      flex-shrink: 0;
+      transition: border-color 0.58s var(--ease-out), box-shadow 0.58s var(--ease-out), transform 0.58s var(--ease-out);
+    }
+
+    .project-row:hover .project-icon {
+      border-color: var(--accent-border);
+      box-shadow: var(--glass-gold-highlight), 0 6px 16px rgba(0, 0, 0, 0.48), 0 0 14px var(--accent-ambient);
+    }
+
+    .project-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .project-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      color: var(--text-strong);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.48s var(--ease-out);
+    }
+
+    .project-row:hover .project-title {
+      color: var(--accent-bright);
+    }
+
+    .project-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.48s var(--ease-out);
+    }
+
+    /* Activity List */
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .activity-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 26px;
+      font-size: 13px;
+      transition: transform 0.52s var(--ease-out);
+    }
+
+    .activity-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .activity-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: var(--surface);
+      background-image: var(--surface-glass);
+      border: 1px solid var(--border);
+      box-shadow: var(--glass-highlight);
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      color: var(--text-muted);
+      transition: border-color 0.52s var(--ease-out), box-shadow 0.52s var(--ease-out);
+    }
+
+    .activity-row:hover .activity-icon {
+      border-color: var(--border-hover);
+      box-shadow: var(--glass-gold-highlight);
+    }
+
+    .activity-text {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .activity-name {
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      color: var(--text-strong);
+      flex-shrink: 0;
+      transition: color 0.48s var(--ease-out);
+    }
+
+    .activity-detail {
+      color: var(--text-muted);
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .activity-right {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .activity-duration {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .activity-link-arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.52s var(--ease-out), transform 0.52s var(--ease-out);
+    }
+
+    a.activity-link-arrow:hover {
+      color: var(--accent-bright);
+      transform: translate(2px, -2px);
+    }
+
+    /* Recent Plays — Single Row of 10 (Onyx Glass & 24K Champagne Gold Theme) */
+    .plays-stack {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .plays-row {
+      display: flex;
+      align-items: stretch;
+      gap: 5px;
+      height: 48px;
+      width: 100%;
+      transition: height 0.68s var(--ease-out);
+    }
+
+    .plays-row.has-live,
+    .plays-row:hover {
+      height: 64px;
+    }
+
+    .play-card {
+      position: relative;
+      flex: 1 1 0%;
+      min-width: 0;
+      border-radius: 9px;
+      overflow: hidden;
+      contain: layout paint style;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--glass-highlight);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: flex-grow 0.72s var(--ease-out),
+                  border-color 0.58s var(--ease-out),
+                  box-shadow 0.58s var(--ease-out),
+                  opacity 0.58s var(--ease-out),
+                  transform 0.58s var(--ease-out);
+    }
+
+    .play-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.13) 0%, rgba(212, 175, 55, 0.03) 45%, transparent 100%);
+      pointer-events: none;
+      z-index: 2;
+      transition: opacity 0.58s var(--ease-out);
+    }
+
+    .play-card.now-playing {
+      border-color: var(--accent-border-strong);
+      box-shadow: var(--glass-gold-highlight), 0 8px 22px rgba(0, 0, 0, 0.62), 0 0 18px var(--accent-glow-soft);
+    }
+
+    .plays-row.has-live:not(:hover) .play-card.now-playing,
+    .play-card:hover {
+      flex-grow: 6.5;
+      border-color: var(--accent-border);
+      box-shadow: var(--glass-gold-highlight), 0 12px 28px rgba(0, 0, 0, 0.72), 0 0 18px var(--accent-ambient);
+      z-index: 5;
+    }
+
+    .plays-row.has-live:not(:hover) .play-card.now-playing,
+    .play-card.now-playing:hover {
+      border-color: var(--accent-border-strong);
+      box-shadow: var(--glass-gold-highlight), 0 12px 28px rgba(0, 0, 0, 0.74), 0 0 24px var(--accent-glow-soft);
+    }
+
+    .plays-row:hover .play-card:not(:hover) {
+      opacity: 0.54;
+    }
+
+    .play-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      backface-visibility: hidden;
+      transform: translateZ(0) scale(1.01);
+      transition: transform 0.78s var(--ease-out), filter 0.65s var(--ease-out);
+      display: block;
+    }
+
+    .plays-row.has-live:not(:hover) .play-card.now-playing .play-bg,
+    .play-card:hover .play-bg {
+      filter: brightness(0.24) blur(7px) saturate(1.14);
+      transform: translateZ(0) scale(1.11);
+    }
+
+    /* Adaptive Light Song Background Mode */
+    .plays-row.has-live:not(:hover) .play-card.now-playing.light-bg .play-bg,
+    .play-card.light-bg:hover .play-bg {
+      filter: brightness(0.84) blur(7px) saturate(1.08);
+      transform: translateZ(0) scale(1.11);
+    }
+
+    .play-live-pip {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, var(--accent-shimmer), var(--accent));
+      box-shadow: 0 0 9px var(--accent-glow);
+      z-index: 3;
+      transition: opacity 0.48s var(--ease-out), transform 0.48s var(--ease-out);
+    }
+
+    .plays-row.has-live:not(:hover) .play-card.now-playing .play-live-pip,
+    .play-card:hover .play-live-pip {
+      opacity: 0;
+      transform: scale(0.75);
+    }
+
+    .play-expanded {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateX(-5px);
+      pointer-events: none;
+      transition: opacity 0.56s var(--ease-out), transform 0.62s var(--ease-out);
+      min-width: 0;
+    }
+
+    .plays-row.has-live:not(:hover) .play-card.now-playing .play-expanded,
+    .play-card:hover .play-expanded {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .play-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--surface);
+      border: 1px solid rgba(245, 223, 152, 0.22);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.52);
+      transition: transform 0.62s var(--ease-out), border-color 0.52s var(--ease-out);
+    }
+
+    .play-card.light-bg .play-thumb {
+      border-color: rgba(0, 0, 0, 0.16);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .play-meta {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .play-meta-top {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      color: rgba(245, 223, 152, 0.72);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .play-card.light-bg .play-meta-top {
+      color: rgba(10, 10, 14, 0.68);
+    }
+
+    .play-now-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--accent-bright);
+      font-weight: 600;
+    }
+
+    /* Monochrome App Icon: White on dark song bg, Black on light song bg */
+    .play-app-icon {
+      width: 12px;
+      height: 12px;
+      display: block;
+      flex-shrink: 0;
+      color: #ffffff;
+      fill: currentColor;
+      transition: color 0.45s var(--ease-out);
+    }
+
+    .play-card.light-bg .play-app-icon {
+      color: #000000;
+    }
+
+    /* GPU-composited Equalizer Bars */
+    .eq-bars {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 1.5px;
+      height: 9px;
+    }
+
+    .eq-bars span {
+      width: 2px;
+      height: 9px;
+      background: linear-gradient(180deg, var(--accent-shimmer), var(--accent));
+      border-radius: 1px;
+      transform-origin: bottom center;
+      animation: eqBounce 0.88s var(--ease-in-out) infinite alternate;
+    }
+
+    .play-card.light-bg .eq-bars span {
+      background: linear-gradient(180deg, var(--accent-mid), var(--accent-deep));
+    }
+
+    .eq-bars span:nth-child(2) { animation-delay: 0.22s; }
+    .eq-bars span:nth-child(3) { animation-delay: 0.44s; }
+
+    @keyframes eqBounce {
+      0% { transform: scaleY(0.24); }
+      100% { transform: scaleY(1); }
+    }
+
+    .play-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.22;
+    }
+
+    .play-card.light-bg .play-title {
+      color: #09090b;
+    }
+
+    .play-artist {
+      font-size: 11px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.76);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+    }
+
+    .play-card.light-bg .play-artist {
+      color: rgba(9, 9, 11, 0.74);
+    }
+
+    .play-progress {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      height: 2px;
+      width: 100%;
+      background: var(--accent-gradient);
+      box-shadow: 0 0 10px var(--accent-glow);
+      z-index: 4;
+      transform-origin: left center;
+      transform: scaleX(0);
+    }
+
+    @media (max-width: 540px) {
+      .plays-row { height: 38px; gap: 4px; }
+      .plays-row.has-live,
+      .plays-row:hover { height: 56px; }
+      .play-thumb { width: 38px; height: 38px; }
+      .play-expanded { padding: 6px 8px; gap: 8px; }
+    }
+
+    /* Footer */
+    .page-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: -6px;
+    }
+
+    .social-links {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .social-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.52s var(--ease-out), transform 0.52s var(--ease-out), filter 0.52s var(--ease-out);
+    }
+
+    .social-link:hover {
+      color: var(--accent-bright);
+      transform: translateY(-2px);
+      filter: drop-shadow(0 3px 8px var(--accent-glow-soft));
+    }
+
+    .social-link svg {
+      width: 15px;
+      height: 15px;
+      fill: currentColor;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-media-wrap" id="bg-media-wrap" aria-hidden="true">
+    <img id="bg-image" class="bg-media" alt="" decoding="async" />
+    <video id="bg-video" class="bg-media" autoplay loop muted playsinline preload="metadata"></video>
+    <div class="bg-media-overlay"></div>
+  </div>
+
+  <div id="boot-loader" aria-hidden="true">
+    <div class="loader-dot"></div>
+  </div>
+
+  <main class="page-wrap">
+
+    <header class="profile-top">
+      <div class="profile-identity">
+        <div class="avatar-wrap">
+          <img id="avatar" class="avatar-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="zack" fetchpriority="high" decoding="async" />
+          <img id="avatar-decoration" class="avatar-deco" src="" alt="" decoding="async" style="display: none;" />
+          <div class="status-dot" id="status-badge">
+            <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#52525b"/></svg>
+          </div>
+        </div>
+
+        <div class="identity-text">
+          <h1 class="display-name" id="username">zack</h1>
+          <div class="sub-identity">
+            <span class="handle-copy clickable" id="status-text">
+              <span class="handle-text" id="handle-name">byeu_u</span>
+              <span class="handle-copied" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                copied
+              </span>
+            </span>
+            <span class="clan-tag" id="clan-tag">
+              <img class="clan-tag-icon" id="clan-tag-icon" src="" alt="" decoding="async" />
+              <span id="clan-tag-text"></span>
+            </span>
+            <div class="discord-badges" id="discord-badges"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bio-line" id="bio-line"></div>
+    </header>
+
+    <section class="sec-block">
+      <div class="sec-head">
+        <span>current project</span>
+      </div>
+
+      <a id="cloud-project-row" href="https://discord.gg/2rYtaG23ht" target="_blank" rel="noopener noreferrer" class="project-row">
+        <img id="cloud-proj-icon" class="project-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" decoding="async" />
+        <div class="project-info">
+          <span class="project-title" id="cloud-proj-name">cloud</span>
+          <span class="project-desc" id="cloud-proj-desc">10k+ pfps in all kinds, niche, anime, match etc</span>
+        </div>
+      </a>
+    </section>
+
+    <section class="sec-block">
+      <div class="sec-head">
+        <span>activity</span>
+      </div>
+
+      <div class="activity-list" id="activity-list"></div>
+    </section>
+
+    <section class="sec-block">
+      <div class="sec-head">
+        <span>recent plays</span>
+        <a href="https://www.last.fm/user/renumerate" target="_blank" rel="noopener noreferrer" class="sec-head-right">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M10.584 17.21l-.88-2.392s-1.43 1.594-3.573 1.594c-1.897 0-3.244-1.649-3.244-4.288 0-3.382 1.704-4.591 3.381-4.591 2.42 0 3.189 1.567 3.849 3.574l.88 2.749c.88 2.666 2.529 4.81 7.285 4.81 3.409 0 5.718-1.044 5.718-3.793 0-2.227-1.265-3.381-3.63-3.931l-1.758-.385c-1.21-.275-1.567-.77-1.567-1.595 0-.934.742-1.484 1.952-1.484 1.32 0 2.034.495 2.144 1.677l2.749-.33c-.22-2.474-1.924-3.492-4.729-3.492-2.474 0-4.893.935-4.893 3.932 0 1.87.907 3.051 3.189 3.601l1.87.44c1.402.33 1.869.907 1.869 1.704 0 1.017-.99 1.43-2.86 1.43-2.776 0-3.93-1.457-4.59-3.464l-.907-2.75c-1.155-3.573-2.997-4.893-6.653-4.893C2.144 5.333 0 7.89 0 12.233c0 4.18 2.144 6.434 5.993 6.434 3.106 0 4.591-1.457 4.591-1.457z"/>
+          </svg>
+          <span id="lastfm-stats-label">stats</span>
+        </a>
+      </div>
+
+      <div class="plays-stack" id="lastfm-grid"></div>
+    </section>
+
+    <footer class="page-footer">
+      <div class="social-links">
+        <a href="https://instagram.com/byew_p" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
+          <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </a>
+        <a href="https://t.me/misrepent" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Telegram">
+          <svg viewBox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.14-.26.26-.534.26l.213-3.053 5.56-5.023c.242-.213-.054-.334-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.832.941z"/></svg>
+        </a>
+        <a href="https://tiktok.com/@skreenies" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="TikTok">
+          <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1Z"/></svg>
+        </a>
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    const BADGE_CDN_BASE = "https://cdn.jsdelivr.net/gh/mezotv/discord-badges@main/assets";
+
+    const DEFAULT_VINYL_SVG =
+      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23f5df98'/%3E%3Cstop offset='50%25' stop-color='%23d4af37'/%3E%3Cstop offset='100%25' stop-color='%239a7418'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='300' height='300' fill='%230a0a0c'/%3E%3Ccircle cx='150' cy='150' r='58' fill='none' stroke='%2327272a' stroke-width='6'/%3E%3Ccircle cx='150' cy='150' r='16' fill='url(%23g)'/%3E%3C/svg%3E";
+
+    const MONO_MUSIC_SVGS = {
+      spotify: `<svg class="play-app-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>`,
+      soundcloud: `<svg class="play-app-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M1.175 12.225c-.051 0-.094.046-.101.1l-.233 2.154.233 2.105c.007.058.05.098.101.098.05 0 .09-.04.099-.098l.255-2.105-.27-2.154c-.009-.06-.052-.1-.084-.1zm-.899.828c-.06 0-.091.037-.104.094L0 14.479l.165 1.308c.014.057.045.094.09.094s.089-.037.099-.094l.19-1.308-.19-1.334c-.01-.057-.044-.09-.078-.09zm1.83-1.229c-.061 0-.12.045-.12.104l-.21 2.563.225 2.458c0 .06.045.104.106.104.061 0 .12-.044.12-.104l.24-2.458-.24-2.563c0-.059-.059-.104-.121-.104zm.945-.089c-.075 0-.135.06-.15.135l-.193 2.64.21 2.547c.015.077.075.135.149.135.075 0 .135-.058.15-.135l.225-2.547-.225-2.64c-.015-.075-.075-.135-.166-.135zm1.005.36c-.09 0-.165.075-.165.165l-.18 2.399.18 2.473c0 .09.075.165.165.165.09 0 .165-.075.165-.165l.21-2.473-.21-2.399c0-.09-.075-.165-.165-.165zm1.035-.99c-.105 0-.195.09-.195.195l-.165 3.224.165 2.533c0 .104.09.194.195.194s.195-.09.195-.194l.195-2.533-.195-3.224c0-.105-.09-.195-.195-.195zm1.064-.465c-.12 0-.21.09-.225.21l-.15 3.675.15 2.563c.015.12.105.21.225.21.12 0 .21-.09.225-.21l.18-2.563-.18-3.675c-.015-.12-.105-.21-.225-.21zm1.095-.345c-.135 0-.24.105-.24.24l-.135 3.99.135 2.578c0 .135.105.24.24.24.135 0 .24-.105.24-.24l.165-2.578-.165-3.99c0-.135-.105-.24-.24-.24zm1.125-.075c-.15 0-.27.12-.27.27l-.12 4.035.12 2.593c0 .15.12.27.27.27.15 0 .27-.12.27-.27l.15-2.593-.15-4.035c0-.15-.12-.27-.27-.27zm1.154.225c-.165 0-.285.12-.3.285l-.105 3.795.105 2.608c.015.165.135.285.3.285.165 0 .285-.12.3-.285l.135-2.608-.135-3.795c-.015-.165-.135-.285-.3-.285zm1.185-.945c-.18 0-.315.135-.33.315l-.09 4.71.09 2.623c.015.18.15.315.33.315.18 0 .315-.135.33-.315l.12-2.623-.12-4.71c-.015-.18-.15-.315-.33-.315zm8.97 2.864c-.405 0-.795.075-1.155.225-.24-2.684-2.49-4.799-5.234-4.799-.675 0-1.335.135-1.935.375-.225.09-.285.18-.285.36v9.448c0 .18.15.33.33.345h8.279c1.83 0 3.315-1.485 3.315-3.314 0-1.83-1.485-3.315-3.315-3.315z"/></svg>`,
+      "youtube music": `<svg class="play-app-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm0 19.104c-3.924 0-7.104-3.18-7.104-7.104S8.076 4.896 12 4.896s7.104 3.18 7.104 7.104-3.18 7.104-7.104 7.104zm0-13.332c-3.432 0-6.228 2.796-6.228 6.228S8.568 18.228 12 18.228s6.228-2.796 6.228-6.228S15.432 5.772 12 5.772zM9.684 15.54V8.46L15.816 12l-6.132 3.54z"/></svg>`
+    };
+
+    const DISCORD_SVG_BADGE_MAP = {
+      active_developer: "activedeveloper.svg",
+      early_supporter: "discordearlysupporter.svg",
+      hypesquad_events: "hypesquadevents.svg",
+      hypesquad_house_1: "hypesquadbravery.svg",
+      hypesquad_house_2: "hypesquadbrilliance.svg",
+      hypesquad_house_3: "hypesquadbalance.svg",
+      bug_hunter_level_1: "discordbughunter1.svg",
+      bug_hunter_level_2: "discordbughunter2.svg",
+      verified_developer: "discordbotdev.svg",
+      certified_moderator: "discordmod.svg",
+      staff: "discordstaff.svg",
+      partner: "discordpartner.svg",
+      quest_completed: "quest.png",
+      orb_profile_badge: "orbs.svg",
+      premium: "discordnitro.svg"
+    };
+
+    const STATUS_SVGS = {
+      online: '<svg viewBox="0 0 16 16"><defs><linearGradient id="stGold" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f5df98"/><stop offset="55%" stop-color="#d4af37"/><stop offset="100%" stop-color="#9a7418"/></linearGradient></defs><circle cx="8" cy="8" r="8" fill="url(#stGold)"/></svg>',
+      idle: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#d97706"/></svg>',
+      dnd: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#ef4444"/><rect x="3" y="6.5" width="10" height="3" rx="1.5" fill="var(--bg)"/></svg>',
+      offline: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#52525b"/><circle cx="8" cy="8" r="4" fill="var(--bg)"/></svg>'
+    };
+
+    const APP_URL_MAP = [
+      { match: ["zed"], url: "https://zed.dev" },
+      { match: ["lunar client", "lunarclient", "lunar"], url: "https://www.lunarclient.com" },
+      { match: ["modrinth"], url: "https://modrinth.com" },
+      { match: ["minecraft"], url: "https://www.minecraft.net" },
+      { match: ["sober"], url: "https://sober.vinegarhq.org" },
+      { match: ["roblox"], url: "https://www.roblox.com" },
+      { match: ["visual studio code", "vs code", "vscode", "code"], url: "https://code.visualstudio.com" },
+      { match: ["assetto corsa"], url: "https://assettocorsa.gg" },
+      { match: ["davinci"], url: "https://www.blackmagicdesign.com/products/davinciresolve" },
+      { match: ["obs"], url: "https://obsproject.com" },
+      { match: ["photoshop"], url: "https://www.adobe.com/products/photoshop.html" },
+      { match: ["spotify"], url: "https://open.spotify.com" },
+      { match: ["soundcloud"], url: "https://soundcloud.com" },
+      { match: ["youtube music", "yt music", "youtubemusic"], url: "https://music.youtube.com" },
+      { match: ["steam"], url: "https://store.steampowered.com" },
+      { match: ["github"], url: "https://github.com" },
+      { match: ["kitty"], url: "https://sw.kovidgoyal.net/kitty/" }
+    ];
+
+    const ARROW_SVG = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>`;
+    const CLOCK_SVG = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+    const PAD_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4m-2-2v4m7-1h.01M18 11h.01"/></svg>`;
+
+    /* Regex to detect any line containing a URL or domain link */
+    const LINE_LINK_REGEX = /(?:https?:\/\/|www\.|discord\.gg\/|discord\.com\/invite\/|t\.me\/|\b[a-z0-9-]+\.(?:gg|com|net|org|io|me|co|tv|xyz|dev|app|lol|sh|to|fm|ly|link|bio|cc)\b)/i;
+
+    const scheduleIdle = window.requestIdleCallback || (cb => setTimeout(cb, 16));
+
+    /* Cached DOM References */
+    const DOM = {
+      loader: document.getElementById("boot-loader"),
+      avatar: document.getElementById("avatar"),
+      avatarDeco: document.getElementById("avatar-decoration"),
+      statusBadge: document.getElementById("status-badge"),
+      username: document.getElementById("username"),
+      statusText: document.getElementById("status-text"),
+      handleName: document.getElementById("handle-name"),
+      clanTag: document.getElementById("clan-tag"),
+      clanTagIcon: document.getElementById("clan-tag-icon"),
+      clanTagText: document.getElementById("clan-tag-text"),
+      discordBadges: document.getElementById("discord-badges"),
+      bioLine: document.getElementById("bio-line"),
+      cloudIcon: document.getElementById("cloud-proj-icon"),
+      cloudName: document.getElementById("cloud-proj-name"),
+      cloudDesc: document.getElementById("cloud-proj-desc"),
+      activityList: document.getElementById("activity-list"),
+      lastfmGrid: document.getElementById("lastfm-grid"),
+      lastfmStats: document.getElementById("lastfm-stats-label")
+    };
+
+    /* Background Image & Video Setup (Supports bg.png, all image types, and video formats) */
+    (function initBackgroundMedia() {
+      const wrap = document.getElementById("bg-media-wrap");
+      const imgEl = document.getElementById("bg-image");
+      const videoEl = document.getElementById("bg-video");
+      if (!wrap || !imgEl || !videoEl) return;
+
+      const candidates = Array.from(
+        new Set([BG_MEDIA_URL, ...BG_FALLBACK_CANDIDATES].filter(Boolean))
+      );
+
+      const isVideoUrl = url => /\.(mp4|webm|ogg|mov)(?:[?#]|$)/i.test(url);
+
+      let idx = 0;
+
+      function tryNext() {
+        if (idx >= candidates.length) {
+          wrap.remove();
+          return;
+        }
+
+        const candidate = candidates[idx++];
+
+        if (isVideoUrl(candidate)) {
+          imgEl.classList.remove("active");
+          videoEl.src = candidate;
+          const onVideoReady = () => {
+            videoEl.classList.add("active");
+            wrap.classList.add("ready");
+            videoEl.play().catch(() => {});
+          };
+          videoEl.addEventListener("loadeddata", onVideoReady, { once: true });
+          videoEl.addEventListener("canplay", onVideoReady, { once: true });
+          videoEl.addEventListener("error", () => {
+            videoEl.removeEventListener("loadeddata", onVideoReady);
+            videoEl.removeEventListener("canplay", onVideoReady);
+            tryNext();
+          }, { once: true });
+        } else {
+          const probe = new Image();
+          probe.decoding = "async";
+          probe.onload = () => {
+            videoEl.classList.remove("active");
+            imgEl.src = candidate;
+            imgEl.classList.add("active");
+            wrap.classList.add("ready");
+          };
+          probe.onerror = () => {
+            tryNext();
+          };
+          probe.src = candidate;
+        }
+      }
+
+      tryNext();
+
+      document.addEventListener("visibilitychange", () => {
+        if (!videoEl.classList.contains("active")) return;
+        if (!document.hidden && wrap.classList.contains("ready")) {
+          videoEl.play().catch(() => {});
+        } else if (document.hidden) {
+          videoEl.pause();
+        }
+      });
+    })();
+
+    /* Debounced Idle LocalStorage State Cache */
+    const stateCache = (() => {
+      try {
+        return JSON.parse(localStorage.getItem(CACHE_KEY)) || {};
+      } catch {
+        return {};
+      }
+    })();
+
+    let saveCacheTimer = null;
+    function saveCache(patch) {
+      Object.assign(stateCache, patch);
+      clearTimeout(saveCacheTimer);
+      saveCacheTimer = setTimeout(() => {
+        scheduleIdle(() => {
+          try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify(stateCache));
+          } catch {}
+        });
+      }, 450);
+    }
+
+    const ESC_MAP = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+    function escapeHTML(str) {
+      return String(str || "").replace(/[&<>"']/g, m => ESC_MAP[m]);
+    }
+
+    let currentDiscordUsername = stateCache.dstnUser?.username || stateCache.presence?.discord_user?.username || "byeu_u";
+    let lastBadgesSig = "";
+    let lastBioSig = "";
+    let lastActivitySig = "";
+    let lastDstnSig = "";
+    let copyTimer = null;
+
+    DOM.statusText.addEventListener("click", function () {
+      if (!navigator.clipboard) return;
+      navigator.clipboard.writeText(currentDiscordUsername).then(() => {
+        clearTimeout(copyTimer);
+        this.classList.add("copied");
+        copyTimer = setTimeout(() => {
+          this.classList.remove("copied");
+        }, 1250);
+      }).catch(() => {});
+    });
+
+    function resolveBadgeAssets(b) {
+      const id = String(b.id || "").toLowerCase();
+      const rawIcon = b.icon || b.asset || "";
+      let dcdnUrl = b.icon_url || b.iconUrl || "";
+      if (!dcdnUrl && rawIcon) {
+        dcdnUrl = rawIcon.startsWith("http") ? rawIcon : `https://cdn.discordapp.com/badge-icons/${rawIcon}.png`;
+      }
+      const svgFallback = DISCORD_SVG_BADGE_MAP[id] ? `${BADGE_CDN_BASE}/${DISCORD_SVG_BADGE_MAP[id]}` : null;
+      return { primaryUrl: dcdnUrl || svgFallback, fallbackUrl: dcdnUrl && svgFallback ? svgFallback : null };
+    }
+
+    function renderDiscordBadges(badgesArray) {
+      if (!DOM.discordBadges || !Array.isArray(badgesArray)) return;
+
+      const seen = new Set();
+      const normalized = [];
+
+      for (let i = 0; i < badgesArray.length; i++) {
+        const b = badgesArray[i];
+        if (!b || b.hidden === true || b.visible === false) continue;
+        const id = b.id || b.icon || b.description;
+        if (!id || seen.has(id)) continue;
+        const { primaryUrl, fallbackUrl } = resolveBadgeAssets(b);
+        if (!primaryUrl) continue;
+        seen.add(id);
+        normalized.push({ id, iconUrl: primaryUrl, fallbackUrl });
+      }
+
+      const sig = normalized.map(b => `${b.id}:${b.iconUrl}`).join("|");
+      if (sig === lastBadgesSig) return;
+      lastBadgesSig = sig;
+
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < normalized.length; i++) {
+        const b = normalized[i];
+        const img = document.createElement("img");
+        img.className = "discord-badge-icon";
+        img.src = b.iconUrl;
+        img.alt = "";
+        img.decoding = "async";
+        img.onerror = () => {
+          if (b.fallbackUrl && img.src !== b.fallbackUrl) img.src = b.fallbackUrl;
+          else img.remove();
+        };
+        frag.appendChild(img);
+      }
+      DOM.discordBadges.replaceChildren(frag);
+    }
+
+    function updateClanTag(clanObj) {
+      if (clanObj && clanObj.tag && clanObj.identity_enabled !== false) {
+        if (DOM.clanTagText.textContent !== clanObj.tag) DOM.clanTagText.textContent = clanObj.tag;
+        if (clanObj.identity_guild_id && clanObj.badge) {
+          const url = `https://cdn.discordapp.com/clan-badges/${clanObj.identity_guild_id}/${clanObj.badge}.png?size=32`;
+          if (DOM.clanTagIcon.src !== url) DOM.clanTagIcon.src = url;
+          DOM.clanTagIcon.style.display = "block";
+          DOM.clanTagIcon.onerror = () => { DOM.clanTagIcon.style.display = "none"; };
+        } else {
+          DOM.clanTagIcon.style.display = "none";
+        }
+        DOM.clanTag.style.display = "inline-flex";
+      } else {
+        DOM.clanTag.style.display = "none";
+      }
+    }
+
+    /* Filter out any line in the bio that contains a link or domain */
+    function renderDiscordBio(rawBio) {
+      const cleanBio = String(rawBio || "")
+        .split(/\r?\n/)
+        .filter(line => !LINE_LINK_REGEX.test(line))
+        .map(line => line.replace(/^\s*-\s*#\s*/, "").replace(/-\s*#/g, "").trim())
+        .filter(Boolean)
+        .join("\n")
+        .trim();
+
+      if (cleanBio === lastBioSig) return;
+      lastBioSig = cleanBio;
+
+      if (!cleanBio) {
+        DOM.bioLine.textContent = "";
+        return;
+      }
+
+      DOM.bioLine.innerHTML = escapeHTML(cleanBio).replace(
+        /&lt;(a?):([a-zA-Z0-9_]+):(\d+)&gt;/g,
+        (_, anim, name, id) =>
+          `<img class="bio-emoji" src="https://cdn.discordapp.com/emojis/${id}.${anim === "a" ? "gif" : "webp"}?size=32" alt=":${name}:" loading="lazy" decoding="async" />`
+      );
+    }
+
+    /* Preserve exact Display Name casing without forcing uppercase */
+    function updateUserHeader(user, fullProfileData = null) {
+      if (!user) return;
+      const rawName = (user.global_name || user.display_name || user.username || "zack").trim();
+
+      if (DOM.username.textContent !== rawName) {
+        DOM.username.textContent = rawName;
+        document.title = rawName;
+      }
+
+      const nameStyle = fullProfileData?.user_profile?.display_name_style || user.display_name_style;
+      if (nameStyle && nameStyle.colors && nameStyle.colors.length >= 2) {
+        DOM.username.style.setProperty("--color-1", nameStyle.colors[0]);
+        DOM.username.style.setProperty("--color-2", nameStyle.colors[1]);
+        DOM.username.style.setProperty("--name-angle", (nameStyle.angle || 90) + "deg");
+        DOM.username.classList.add("has-gradient");
+        if (nameStyle.animated || nameStyle.effect === "animated") {
+          DOM.username.classList.add("animated");
+        }
+      }
+
+      if (user.username) {
+        currentDiscordUsername = user.username;
+        if (DOM.handleName.textContent !== user.username) DOM.handleName.textContent = user.username;
+      }
+
+      if (user.avatar) {
+        const uid = user.id || DISCORD_ID;
+        const ext = user.avatar.startsWith("a_") ? "gif" : "png";
+        const avatarSrc = `https://cdn.discordapp.com/avatars/${uid}/${user.avatar}.${ext}?size=256`;
+        if (DOM.avatar.src !== avatarSrc) DOM.avatar.src = avatarSrc;
+      }
+
+      const asset = user.avatar_decoration_data?.asset;
+      if (asset) {
+        const src = `https://cdn.discordapp.com/avatar-decoration-presets/${asset}.png?size=160&passthrough=true`;
+        if (DOM.avatarDeco.src !== src) DOM.avatarDeco.src = src;
+        DOM.avatarDeco.style.display = "block";
+      } else {
+        DOM.avatarDeco.style.display = "none";
+      }
+
+      const clanData =
+        user.clan ||
+        user.primary_guild ||
+        fullProfileData?.user_profile?.clan ||
+        fullProfileData?.user_profile?.primary_guild ||
+        null;
+      if (clanData || fullProfileData) updateClanTag(clanData);
+    }
+
+    function applyDstnPayload(data) {
+      if (!data) return;
+      const user = data.user || data.account || {};
+      const bio = user.bio ?? data.user_profile?.bio ?? "";
+      const badges = [
+        ...(Array.isArray(data.badges) ? data.badges : []),
+        ...(Array.isArray(data.user_profile?.badges) ? data.user_profile.badges : [])
+      ];
+      const sig = `${user.username}:${user.global_name}:${user.avatar}:${user.avatar_decoration_data?.asset}:${user.clan?.tag || ""}:${bio}:${badges.map(b => b.icon || b.id).join(",")}`;
+      if (sig === lastDstnSig) return;
+      lastDstnSig = sig;
+
+      updateUserHeader(user, data);
+      renderDiscordBio(bio);
+      renderDiscordBadges(badges);
+      saveCache({ dstnUser: user, dstnFull: data, bio, badges });
+    }
+
+    let isFetchingDstn = false;
+    async function fetchDiscordProfile() {
+      if (document.hidden || isFetchingDstn) return;
+      isFetchingDstn = true;
+      try {
+        const data = await fetchJson(`https://dcdn.dstn.to/profile/${DISCORD_ID}`, true);
+        if (data) applyDstnPayload(data);
+      } finally {
+        isFetchingDstn = false;
+      }
+    }
+
+    /* ====================================================
+       RECENT PLAYS + DISCORD MUSIC SEAMLESS QUE
+       ==================================================== */
+    const rawArtworks = stateCache.artworks || {};
+    const artworkCache = new Map(
+      Object.entries(rawArtworks).filter(([, v]) => typeof v === "string" && v.startsWith("http"))
+    );
+    const missingArtworkCache = new Map();
+    const inflightArtwork = new Map();
+    const normCache = new Map();
+
+    /* OffscreenCanvas 4x4 Cover Luminance Sampler */
+    const coverLuminanceCache = new Map(Object.entries(stateCache.lum || {}));
+    const inflightLuminance = new Set();
+    const lumCanvas = typeof OffscreenCanvas !== "undefined"
+      ? new OffscreenCanvas(4, 4)
+      : Object.assign(document.createElement("canvas"), { width: 4, height: 4 });
+    const lumCtx = lumCanvas.getContext("2d", { willReadFrequently: true });
+
+    function applyCardCoverLuminance(card, imgUrl) {
+      if (!imgUrl || !imgUrl.startsWith("http") || !lumCtx) {
+        card.classList.remove("light-bg");
+        return;
+      }
+      if (coverLuminanceCache.has(imgUrl)) {
+        card.classList.toggle("light-bg", Boolean(coverLuminanceCache.get(imgUrl)));
+        return;
+      }
+      if (inflightLuminance.has(imgUrl)) return;
+      inflightLuminance.add(imgUrl);
+
+      scheduleIdle(() => {
+        const probe = new Image();
+        probe.crossOrigin = "anonymous";
+        probe.decoding = "async";
+        probe.onload = () => {
+          inflightLuminance.delete(imgUrl);
+          scheduleIdle(() => {
+            try {
+              lumCtx.clearRect(0, 0, 4, 4);
+              lumCtx.drawImage(probe, 0, 0, 4, 4);
+              const d = lumCtx.getImageData(0, 0, 4, 4).data;
+              let sum = 0;
+              for (let i = 0; i < d.length; i += 4) {
+                sum += 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+              }
+              const isLight = sum / 16 > 175 ? 1 : 0;
+              coverLuminanceCache.set(imgUrl, isLight);
+              if (coverLuminanceCache.size > 140) {
+                coverLuminanceCache.delete(coverLuminanceCache.keys().next().value);
+              }
+              saveCache({ lum: Object.fromEntries(coverLuminanceCache) });
+              if (card.dataset.artUrl === imgUrl) {
+                card.classList.toggle("light-bg", Boolean(isLight));
+              }
+            } catch {
+              coverLuminanceCache.set(imgUrl, 0);
+            }
+          });
+        };
+        probe.onerror = () => {
+          inflightLuminance.delete(imgUrl);
+          coverLuminanceCache.set(imgUrl, 0);
+        };
+        probe.src = imgUrl;
+      });
+    }
+
+    let recentDiscordHistory = Array.isArray(stateCache.discordHistory) ? stateCache.discordHistory : [];
+    let activeSpotifyTrack = null;
+    let activeSpotifyKey = "";
+    let currentListeningApp = "spotify";
+    let songEndTimeout = null;
+    let liveProgressEl = null;
+    let liveProgressAnim = null;
+    let lastFmTracks = Array.isArray(stateCache.tracks) ? stateCache.tracks : [];
+    let lastFmTotal = stateCache.totalScrobbles || null;
+    let lastTracksSig = "";
+
+    function normalizeStr(str) {
+      const raw = String(str || "");
+      if (!raw) return "";
+      const cached = normCache.get(raw);
+      if (cached !== undefined) return cached;
+      const val = raw
+        .toLowerCase()
+        .replace(/ - topic$/i, "")
+        .replace(/\s*[\(\[\{].*?[\)\]\}]\s*/g, " ")
+        .replace(/\b(feat\.?|ft\.?|prod\.?|with)\b.*/i, "")
+        .replace(/[^\p{L}\p{N}\s]/gu, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (normCache.size > 300) normCache.clear();
+      normCache.set(raw, val);
+      return val;
+    }
+
+    function getTrackCacheKey(artistRaw, trackRaw) {
+      const firstArtist = String(artistRaw || "").split(/[;,/]/)[0];
+      return `${normalizeStr(firstArtist)}:::${normalizeStr(trackRaw)}`;
+    }
+
+    function isSameSong(artistA, trackA, artistB, trackB) {
+      const normTrackA = normalizeStr(trackA);
+      const normTrackB = normalizeStr(trackB);
+      if (!normTrackA || !normTrackB || normTrackA !== normTrackB) return false;
+
+      const normArtistA = normalizeStr(String(artistA || "").split(/[;,/]/)[0]);
+      const normArtistB = normalizeStr(String(artistB || "").split(/[;,/]/)[0]);
+      if (!normArtistA || !normArtistB) return true;
+      return normArtistA === normArtistB || normArtistA.includes(normArtistB) || normArtistB.includes(normArtistA);
+    }
+
+    function isValidLastFmImage(url) {
+      return Boolean(
+        url &&
+        typeof url === "string" &&
+        url.startsWith("http") &&
+        !url.includes("2a96cbd8b46e442fc41c2b86b821562f") &&
+        !url.includes("4128a6eb29f94943c9d206c08e625904")
+      );
+    }
+
+    function rememberTrackArt(artistRaw, trackRaw, url) {
+      if (!url || !url.startsWith("http")) return;
+      const key = getTrackCacheKey(artistRaw, trackRaw);
+      missingArtworkCache.delete(key);
+      if (artworkCache.get(key) !== url) {
+        artworkCache.set(key, url);
+        if (artworkCache.size > 140) {
+          artworkCache.delete(artworkCache.keys().next().value);
+        }
+        saveCache({ artworks: Object.fromEntries(artworkCache) });
+      }
+    }
+
+    function getCachedTrackArt(artistRaw, trackRaw) {
+      return artworkCache.get(getTrackCacheKey(artistRaw, trackRaw)) || null;
+    }
+
+    function pushToDiscordHistory(trackObj) {
+      if (!trackObj || !trackObj.song) return;
+      const nowUts = Math.floor(Date.now() / 1000);
+      const entry = {
+        name: trackObj.song,
+        artist: trackObj.artist || "Unknown Artist",
+        url: trackObj.url || `https://www.last.fm/user/${LASTFM_USERNAME}`,
+        art: trackObj.art || getCachedTrackArt(trackObj.artist, trackObj.song) || "",
+        uts: nowUts
+      };
+
+      if (
+        recentDiscordHistory.length > 0 &&
+        isSameSong(recentDiscordHistory[0].artist, recentDiscordHistory[0].name, entry.artist, entry.name) &&
+        Math.abs(nowUts - (recentDiscordHistory[0].uts || 0)) < 90
+      ) {
+        recentDiscordHistory[0] = entry;
+      } else {
+        recentDiscordHistory.unshift(entry);
+      }
+
+      recentDiscordHistory = recentDiscordHistory.slice(0, 10);
+      saveCache({ discordHistory: recentDiscordHistory });
+    }
+
+    function resolveActivityUrl(act) {
+      const lower = (act.name || "").toLowerCase().trim();
+      if (lower.includes("spotify")) {
+        if (act.sync_id) return `https://open.spotify.com/track/${act.sync_id}`;
+        if (act.details) return `https://open.spotify.com/search/${encodeURIComponent(act.details + " " + (act.state || ""))}`;
+        return "https://open.spotify.com";
+      }
+      if (lower.includes("soundcloud")) {
+        if (act.details) return `https://soundcloud.com/search?q=${encodeURIComponent(act.details + " " + (act.state || ""))}`;
+        return "https://soundcloud.com";
+      }
+      if (lower.includes("youtube music") || lower.includes("yt music") || lower.includes("youtubemusic")) {
+        if (act.details) return `https://music.youtube.com/search?q=${encodeURIComponent(act.details + " " + (act.state || ""))}`;
+        return "https://music.youtube.com";
+      }
+      if (act.url && /^https?:\/\//i.test(act.url)) return act.url;
+      for (let i = 0; i < APP_URL_MAP.length; i++) {
+        const entry = APP_URL_MAP[i];
+        if (entry.match.some(k => lower.includes(k))) return entry.url;
+      }
+      return act.name ? `https://www.google.com/search?q=${encodeURIComponent(act.name)}` : null;
+    }
+
+    function resolveActivityIcon(act) {
+      const rawImg = act.assets?.large_image || act.assets?.small_image;
+      if (rawImg) {
+        if (rawImg.startsWith("mp:external/")) return `https://media.discordapp.net/${rawImg.replace("mp:", "")}`;
+        if (rawImg.startsWith("spotify:")) return `https://i.scdn.co/image/${rawImg.replace("spotify:", "")}`;
+        if (rawImg.startsWith("http")) return rawImg;
+        if (act.application_id) return `https://cdn.discordapp.com/app-assets/${act.application_id}/${rawImg}.png`;
+      }
+      const lower = (act.name || "").toLowerCase();
+      if (lower.includes("zed")) return "https://www.google.com/s2/favicons?domain=zed.dev&sz=64";
+      if (lower.includes("code")) return "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64";
+      if (lower.includes("roblox") || lower.includes("sober")) return "https://www.google.com/s2/favicons?domain=roblox.com&sz=64";
+      if (lower.includes("modrinth")) return "https://www.google.com/s2/favicons?domain=modrinth.com&sz=64";
+      if (lower.includes("lunar") || lower.includes("minecraft")) return "https://www.google.com/s2/favicons?domain=lunarclient.com&sz=64";
+      if (lower.includes("assetto")) return "https://www.google.com/s2/favicons?domain=assettocorsa.gg&sz=64";
+      if (lower.includes("soundcloud")) return "https://www.google.com/s2/favicons?domain=soundcloud.com&sz=64";
+      if (lower.includes("youtube music") || lower.includes("yt music")) return "https://www.google.com/s2/favicons?domain=music.youtube.com&sz=64";
+      if (lower.includes("spotify")) return "https://www.google.com/s2/favicons?domain=spotify.com&sz=64";
+      return null;
+    }
+
+    function detectMusicApp(act, data) {
+      const hay = `${act?.name || ""} ${act?.assets?.large_text || ""} ${act?.assets?.small_text || ""} ${act?.id || ""}`.toLowerCase();
+      if (hay.includes("soundcloud")) return "soundcloud";
+      if (hay.includes("youtube music") || hay.includes("yt music") || hay.includes("youtubemusic")) return "youtube music";
+      if (hay.includes("spotify") || data?.spotify) return "spotify";
+      return "spotify";
+    }
+
+    function getListeningAppIconHTML(appName) {
+      const key = String(appName || "spotify").toLowerCase();
+      return MONO_MUSIC_SVGS[key] || MONO_MUSIC_SVGS.spotify;
+    }
+
+    function extractLiveSpotifyFromPresence(data) {
+      if (!data) return null;
+      const acts = Array.isArray(data.activities) ? data.activities : [];
+      const musicAct = acts.find(a => {
+        if (!a) return false;
+        const n = String(a.name || "").toLowerCase();
+        return (
+          n === "spotify" ||
+          n.includes("soundcloud") ||
+          n.includes("youtube music") ||
+          n.includes("yt music") ||
+          n.includes("youtubemusic") ||
+          a.id === "spotify:1" ||
+          a.type === 2
+        );
+      });
+
+      const detectedApp = detectMusicApp(musicAct, data);
+      currentListeningApp = detectedApp;
+
+      if (musicAct && detectedApp !== "spotify" && musicAct.details) {
+        const artist = String(musicAct.state || "").replace(/;\s*/g, ", ").trim();
+        const art = resolveActivityIcon(musicAct) || "";
+        return {
+          song: musicAct.details,
+          artist: artist || "Unknown Artist",
+          art,
+          url: resolveActivityUrl(musicAct) || `https://www.last.fm/user/${LASTFM_USERNAME}`,
+          timestamps: musicAct.timestamps || null,
+          trackId: musicAct.sync_id || `${musicAct.details}:${artist}`,
+          app: detectedApp
+        };
+      }
+
+      if (data.spotify && data.spotify.song) {
+        const sp = data.spotify;
+        const artist = String(sp.artist || "").replace(/;\s*/g, ", ").trim();
+        const art = sp.album_art_url || (musicAct ? resolveActivityIcon(musicAct) : "");
+        const url = sp.track_id
+          ? `https://open.spotify.com/track/${sp.track_id}`
+          : `https://open.spotify.com/search/${encodeURIComponent(sp.song + " " + artist)}`;
+        return {
+          song: sp.song,
+          artist: artist || "Unknown Artist",
+          art: art || "",
+          url,
+          timestamps: sp.timestamps || musicAct?.timestamps || null,
+          trackId: sp.track_id || `${sp.song}:${artist}`,
+          app: "spotify"
+        };
+      }
+
+      if (musicAct && musicAct.details) {
+        const artist = String(musicAct.state || "").replace(/;\s*/g, ", ").trim();
+        const art = resolveActivityIcon(musicAct) || "";
+        return {
+          song: musicAct.details,
+          artist: artist || "Unknown Artist",
+          art,
+          url: resolveActivityUrl(musicAct) || `https://open.spotify.com/search/${encodeURIComponent(musicAct.details)}`,
+          timestamps: musicAct.timestamps || null,
+          trackId: musicAct.sync_id || `${musicAct.details}:${artist}`,
+          app: detectedApp
+        };
+      }
+
+      return null;
+    }
+
+    function handleSongFinishTransition() {
+      if (!activeSpotifyTrack) return;
+      const finished = activeSpotifyTrack;
+      activeSpotifyTrack = null;
+      activeSpotifyKey = "";
+      pushToDiscordHistory(finished);
+      syncLiveAndRenderTracks(true);
+      fetchLanyardFastREST();
+      fetchLastFmGrid(true);
+      setTimeout(() => fetchLastFmGrid(true), 1800);
+      setTimeout(() => fetchLastFmGrid(true), 4000);
+    }
+
+    function scheduleSongEndRefresh(timestamps) {
+      clearTimeout(songEndTimeout);
+      if (!timestamps || !timestamps.end) return;
+      const remaining = timestamps.end - Date.now();
+      if (remaining > 0 && remaining < 1800000) {
+        songEndTimeout = setTimeout(handleSongFinishTransition, remaining + 120);
+      }
+    }
+
+    /* Zero-Main-Thread Compositor Progress Bar via Web Animations API */
+    function stopProgressLoop() {
+      if (liveProgressAnim) {
+        liveProgressAnim.cancel();
+        liveProgressAnim = null;
+      }
+    }
+
+    function startProgressLoop() {
+      stopProgressLoop();
+      if (!liveProgressEl || !activeSpotifyTrack?.timestamps?.start || !activeSpotifyTrack?.timestamps?.end) return;
+
+      const { start, end } = activeSpotifyTrack.timestamps;
+      const now = Date.now();
+      const total = Math.max(1, end - start);
+      const ratio = Math.max(0, Math.min(1, (now - start) / total));
+      const remaining = Math.max(0, end - now);
+
+      if (remaining === 0 || typeof liveProgressEl.animate !== "function") {
+        liveProgressEl.style.transform = `scaleX(${ratio.toFixed(4)})`;
+        return;
+      }
+
+      liveProgressAnim = liveProgressEl.animate(
+        [
+          { transform: `scaleX(${ratio.toFixed(4)})` },
+          { transform: "scaleX(1)" }
+        ],
+        {
+          duration: remaining,
+          easing: "linear",
+          fill: "forwards"
+        }
+      );
+    }
+
+    /* In-Place Activity Feed Diffing with Cached Node Pointers */
+    function renderActivityFeed(liveActivities = []) {
+      const items = liveActivities.filter(a => a && a.type !== 4);
+
+      const sig = items.map(a => {
+        const hrs = a.timestamps?.start ? Math.floor((Date.now() - a.timestamps.start) / 3600000) : 0;
+        return `${a.name}:${a.details || ""}:${a.state || ""}:${a.assets?.large_image || ""}:${hrs}`;
+      }).join("|");
+
+      if (sig === lastActivitySig && DOM.activityList.children.length > 0) return;
+      lastActivitySig = sig;
+
+      if (items.length === 0) {
+        DOM.activityList.innerHTML = `
+          <div class="activity-row" data-empty="true" style="justify-content: center; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 11.5px;">
+            <span>idle / nothing playing</span>
+          </div>`;
+        return;
+      }
+
+      if (DOM.activityList.firstElementChild?.dataset.empty === "true") {
+        DOM.activityList.textContent = "";
+      }
+
+      while (DOM.activityList.children.length > items.length) {
+        DOM.activityList.lastElementChild.remove();
+      }
+
+      while (DOM.activityList.children.length < items.length) {
+        const row = document.createElement("div");
+        row.className = "activity-row";
+        row.innerHTML = `
+          <div class="activity-left">
+            <div class="activity-icon-slot"></div>
+            <div class="activity-text">
+              <span class="activity-name"></span>
+              <span class="activity-detail"></span>
+            </div>
+          </div>
+          <div class="activity-right">
+            <span class="activity-duration" style="display:none;"></span>
+            <a class="activity-link-arrow" target="_blank" rel="noopener noreferrer">${ARROW_SVG}</a>
+          </div>`;
+        row._refs = {
+          iconSlot: row.querySelector(".activity-icon-slot"),
+          nameEl: row.querySelector(".activity-name"),
+          detailEl: row.querySelector(".activity-detail"),
+          durEl: row.querySelector(".activity-duration"),
+          arrowEl: row.querySelector(".activity-link-arrow")
+        };
+        DOM.activityList.appendChild(row);
+      }
+
+      for (let idx = 0; idx < items.length; idx++) {
+        const act = items[idx];
+        const row = DOM.activityList.children[idx];
+        const { iconSlot, nameEl, detailEl, durEl, arrowEl } = row._refs;
+        const detail = [act.details, act.state].filter(Boolean).join(" — ") || "Active session";
+        const icon = resolveActivityIcon(act);
+        const url = resolveActivityUrl(act);
+        const hrs = act.timestamps?.start ? Math.floor((Date.now() - act.timestamps.start) / 3600000) : 0;
+
+        if (icon) {
+          let img = iconSlot.firstElementChild;
+          if (!img || img.tagName !== "IMG") {
+            iconSlot.innerHTML = `<img class="activity-icon" alt="" decoding="async" />`;
+            img = iconSlot.firstElementChild;
+          }
+          if (img.getAttribute("src") !== icon) img.src = icon;
+        } else if (!iconSlot.firstElementChild || iconSlot.firstElementChild.tagName !== "DIV") {
+          iconSlot.innerHTML = `<div class="activity-icon">${PAD_SVG}</div>`;
+        }
+
+        if (nameEl.textContent !== (act.name || "")) nameEl.textContent = act.name || "";
+        if (detailEl.textContent !== detail) detailEl.textContent = detail;
+
+        if (hrs >= 1) {
+          const durHTML = `${CLOCK_SVG} ${hrs}h Marathon`;
+          if (durEl.innerHTML !== durHTML) durEl.innerHTML = durHTML;
+          durEl.style.display = "inline-flex";
+        } else {
+          durEl.style.display = "none";
+        }
+
+        if (url) {
+          if (arrowEl.getAttribute("href") !== url) arrowEl.href = url;
+          arrowEl.style.opacity = "";
+          arrowEl.style.pointerEvents = "";
+        } else {
+          arrowEl.removeAttribute("href");
+          arrowEl.style.opacity = "0.45";
+          arrowEl.style.pointerEvents = "none";
+        }
+      }
+    }
+
+    let lastStatusBadge = "";
+    function applyPresenceData(data) {
+      if (!data) return;
+      if (data.discord_user) updateUserHeader(data.discord_user);
+      const st = data.discord_status || "offline";
+      if (st !== lastStatusBadge) {
+        lastStatusBadge = st;
+        DOM.statusBadge.innerHTML = STATUS_SVGS[st] || STATUS_SVGS.offline;
+      }
+      renderActivityFeed(data.activities || []);
+
+      const prevTrack = activeSpotifyTrack;
+      const prevKey = activeSpotifyKey;
+      const liveSp = extractLiveSpotifyFromPresence(data);
+      const nextKey = liveSp ? `${liveSp.trackId}:${liveSp.song}:${liveSp.app}` : "";
+
+      if (prevTrack && prevKey && prevKey !== nextKey) {
+        pushToDiscordHistory(prevTrack);
+      }
+
+      if (liveSp) {
+        activeSpotifyTrack = liveSp;
+        activeSpotifyKey = nextKey;
+        if (liveSp.art && liveSp.art.startsWith("http")) {
+          rememberTrackArt(liveSp.artist, liveSp.song, liveSp.art);
+        }
+        scheduleSongEndRefresh(liveSp.timestamps);
+      } else {
+        activeSpotifyTrack = null;
+        activeSpotifyKey = "";
+        clearTimeout(songEndTimeout);
+      }
+
+      if (prevKey !== activeSpotifyKey) {
+        syncLiveAndRenderTracks(true);
+        fetchLastFmGrid(true);
+        setTimeout(() => fetchLastFmGrid(true), 1500);
+        setTimeout(() => fetchLastFmGrid(true), 3500);
+      } else {
+        startProgressLoop();
+      }
+
+      saveCache({ presence: data });
+    }
+
+    let isFetchingLanyard = false;
+    async function fetchLanyardFastREST() {
+      if (isFetchingLanyard) return;
+      isFetchingLanyard = true;
+      try {
+        const json = await fetchJson(`https://api.lanyard.rest/v1/users/${DISCORD_ID}`, true);
+        if (json?.data) applyPresenceData(json.data);
+      } finally {
+        isFetchingLanyard = false;
+      }
+    }
+
+    let socket = null;
+    let heartbeatInterval = null;
+    let wsReconnectAttempts = 0;
+    let wsReconnectTimer = null;
+    let wsSupported = typeof WebSocket === "function";
+
+    function connectLanyardWS() {
+      if (!wsSupported) return;
+      clearTimeout(wsReconnectTimer);
+      if (socket) {
+        try {
+          socket.onclose = null;
+          socket.onerror = null;
+          socket.close();
+        } catch {}
+        socket = null;
+      }
+
+      try {
+        socket = new WebSocket("wss://api.lanyard.rest/socket");
+      } catch {
+        wsSupported = false;
+        socket = null;
+        fetchLanyardFastREST();
+        return;
+      }
+
+      socket.onopen = () => {
+        wsReconnectAttempts = 0;
+      };
+
+      socket.onerror = () => {};
+
+      socket.onmessage = event => {
+        let msg;
+        try {
+          msg = JSON.parse(event.data);
+        } catch {
+          return;
+        }
+        if (msg.op === 1) {
+          clearInterval(heartbeatInterval);
+          heartbeatInterval = setInterval(() => {
+            if (socket?.readyState === WebSocket.OPEN) {
+              try {
+                socket.send('{"op":3}');
+              } catch {}
+            }
+          }, msg.d.heartbeat_interval);
+          try {
+            socket.send(`{"op":2,"d":{"subscribe_to_id":"${DISCORD_ID}"}}`);
+          } catch {}
+        } else if (msg.t === "INIT_STATE" || msg.t === "PRESENCE_UPDATE") {
+          applyPresenceData(msg.d);
+          if (msg.t === "PRESENCE_UPDATE") fetchDiscordProfile();
+        }
+      };
+
+      socket.onclose = () => {
+        clearInterval(heartbeatInterval);
+        if (!wsSupported) return;
+        const delay = Math.min(10000, 1200 * Math.pow(1.4, wsReconnectAttempts++));
+        wsReconnectTimer = setTimeout(connectLanyardWS, delay);
+      };
+    }
+
+    function applyCloudServer(guild, online, members) {
+      if (!guild) return;
+      if (guild.name && DOM.cloudName.textContent !== guild.name) DOM.cloudName.textContent = guild.name;
+      if (guild.icon) {
+        const ext = guild.icon.startsWith("a_") ? "gif" : "png";
+        const url = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.${ext}?size=128`;
+        if (DOM.cloudIcon.src !== url) DOM.cloudIcon.src = url;
+      }
+      const desc = guild.description
+        ? `${guild.description} (${Number(members || 0).toLocaleString()} members)`
+        : `${Number(online || 0).toLocaleString()} online · ${Number(members || 0).toLocaleString()} members`;
+      if (DOM.cloudDesc.textContent !== desc) DOM.cloudDesc.textContent = desc;
+    }
+
+    /* ====================================================
+       CONCURRENT ABORTABLE ARTWORK RESOLVER (ITUNES + LAST.FM)
+       ==================================================== */
+    function fetchTrackCoverUrl(artistRaw, trackRaw) {
+      const cached = getCachedTrackArt(artistRaw, trackRaw);
+      if (cached) return Promise.resolve(cached);
+
+      const key = getTrackCacheKey(artistRaw, trackRaw);
+      const negTs = missingArtworkCache.get(key);
+      if (negTs && Date.now() - negTs < 600000) {
+        return Promise.resolve(null);
+      }
+
+      if (inflightArtwork.has(key)) return inflightArtwork.get(key);
+
+      const firstArtist = String(artistRaw || "").split(/[;,/]/)[0].trim();
+      const query = `${normalizeStr(firstArtist)} ${normalizeStr(trackRaw)}`.trim();
+      const raceCtrl = new AbortController();
+
+      const fromItunes = async () => {
+        const itunesData = await fetchJson(
+          `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&entity=song&limit=5`,
+          false,
+          3800,
+          raceCtrl.signal
+        );
+        if (Array.isArray(itunesData?.results) && itunesData.results.length > 0) {
+          const matched =
+            itunesData.results.find(r => isSameSong(r.artistName, r.trackName, firstArtist, trackRaw)) ||
+            itunesData.results.find(r => normalizeStr(r.trackName) === normalizeStr(trackRaw));
+          if (matched?.artworkUrl100) {
+            return matched.artworkUrl100.replace("100x100bb", "300x300bb");
+          }
+        }
+        throw new Error();
+      };
+
+      const fromLastFm = async () => {
+        const trackInfo = await fetchJson(
+          `https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=${LASTFM_API_KEY}&artist=${encodeURIComponent(firstArtist)}&track=${encodeURIComponent(trackRaw)}&autocorrect=1&format=json`,
+          false,
+          3800,
+          raceCtrl.signal
+        );
+        const lfmImages = trackInfo?.track?.album?.image;
+        if (Array.isArray(lfmImages)) {
+          const best =
+            lfmImages.find(i => i.size === "extralarge")?.["#text"] ||
+            lfmImages.find(i => i.size === "large")?.["#text"] ||
+            lfmImages[lfmImages.length - 1]?.["#text"];
+          if (isValidLastFmImage(best)) return best;
+        }
+        throw new Error();
+      };
+
+      const promise = Promise.any([fromItunes(), fromLastFm()])
+        .then(winnerUrl => {
+          raceCtrl.abort();
+          rememberTrackArt(artistRaw, trackRaw, winnerUrl);
+          return winnerUrl;
+        })
+        .catch(() => {
+          missingArtworkCache.set(key, Date.now());
+          return null;
+        });
+
+      inflightArtwork.set(key, promise);
+      promise.finally(() => inflightArtwork.delete(key));
+      return promise;
+    }
+
+    function getRelativeTime(uts) {
+      if (!uts) return "just now";
+      const diff = Math.max(1, Math.floor(Date.now() / 1000) - parseInt(uts, 10));
+      if (diff < 60) return "just now";
+      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+      return `${Math.floor(diff / 86400)}d ago`;
+    }
+
+    function extractLastFmTrackImage(track) {
+      if (!Array.isArray(track?.image)) return "";
+      const img =
+        track.image.find(i => i.size === "extralarge")?.["#text"] ||
+        track.image.find(i => i.size === "large")?.["#text"] ||
+        track.image.find(i => i.size === "medium")?.["#text"] ||
+        "";
+      return isValidLastFmImage(img) ? img : "";
+    }
+
+    function buildCombinedTrackList() {
+      const result = [];
+      const lfmSource = Array.isArray(lastFmTracks) ? lastFmTracks : [];
+      const lfmNow = lfmSource.find(t => t?.["@attr"]?.nowplaying === "true");
+
+      if (activeSpotifyTrack) {
+        const lfmImg =
+          lfmNow && isSameSong(lfmNow.artist?.["#text"] || lfmNow.artist?.name, lfmNow.name, activeSpotifyTrack.artist, activeSpotifyTrack.song)
+            ? extractLastFmTrackImage(lfmNow)
+            : "";
+
+        const bestLiveArt = lfmImg || activeSpotifyTrack.art || getCachedTrackArt(activeSpotifyTrack.artist, activeSpotifyTrack.song) || "";
+        if (bestLiveArt) rememberTrackArt(activeSpotifyTrack.artist, activeSpotifyTrack.song, bestLiveArt);
+
+        result.push({
+          name: activeSpotifyTrack.song,
+          artist: activeSpotifyTrack.artist,
+          url: activeSpotifyTrack.url || lfmNow?.url || `https://www.last.fm/user/${LASTFM_USERNAME}`,
+          art: bestLiveArt,
+          isNow: true,
+          app: activeSpotifyTrack.app || currentListeningApp || "spotify",
+          uts: null,
+          timestamps: activeSpotifyTrack.timestamps || null
+        });
+      } else if (lfmNow) {
+        const rawArtist = lfmNow.artist?.["#text"] || lfmNow.artist?.name || "Unknown Artist";
+        const lfmImg = extractLastFmTrackImage(lfmNow);
+        if (lfmImg) rememberTrackArt(rawArtist, lfmNow.name, lfmImg);
+        result.push({
+          name: lfmNow.name || "Unknown Track",
+          artist: rawArtist,
+          url: lfmNow.url || `https://www.last.fm/user/${LASTFM_USERNAME}`,
+          art: lfmImg || getCachedTrackArt(rawArtist, lfmNow.name) || "",
+          isNow: true,
+          app: currentListeningApp || "spotify",
+          uts: null,
+          timestamps: null
+        });
+      }
+
+      const pastLfm = [];
+      for (let i = 0; i < lfmSource.length; i++) {
+        const t = lfmSource[i];
+        if (!t || t["@attr"]?.nowplaying === "true") continue;
+        const rawArtist = t.artist?.["#text"] || t.artist?.name || "Unknown Artist";
+        const rawName = t.name || "Unknown Track";
+        const lfmImg = extractLastFmTrackImage(t);
+        if (lfmImg) rememberTrackArt(rawArtist, rawName, lfmImg);
+        pastLfm.push({
+          name: rawName,
+          artist: rawArtist,
+          url: t.url || `https://www.last.fm/user/${LASTFM_USERNAME}`,
+          art: lfmImg || getCachedTrackArt(rawArtist, rawName) || "",
+          isNow: false,
+          uts: Number(t.date?.uts) || 0
+        });
+      }
+
+      const topLfm = pastLfm[0];
+      const unSyncedDiscord = [];
+      const nowSec = Math.floor(Date.now() / 1000);
+      for (let i = 0; i < recentDiscordHistory.length; i++) {
+        const h = recentDiscordHistory[i];
+        if (result[0]?.isNow && isSameSong(result[0].artist, result[0].name, h.artist, h.name) && Math.abs(nowSec - h.uts) < 15) {
+          continue;
+        }
+        const alreadyInLfm = pastLfm.some(
+          p => isSameSong(p.artist, p.name, h.artist, h.name) && Math.abs((p.uts || 0) - (h.uts || 0)) < 240
+        );
+        if (!alreadyInLfm && (!topLfm || h.uts >= (topLfm.uts || 0) - 60)) {
+          unSyncedDiscord.push({
+            name: h.name,
+            artist: h.artist,
+            url: h.url || `https://www.last.fm/user/${LASTFM_USERNAME}`,
+            art: h.art || getCachedTrackArt(h.artist, h.name) || "",
+            isNow: false,
+            uts: h.uts
+          });
+        }
+      }
+
+      const combinedPast = unSyncedDiscord.length > 0
+        ? [...unSyncedDiscord, ...pastLfm].sort((a, b) => (b.uts || 0) - (a.uts || 0))
+        : pastLfm;
+      result.push(...combinedPast);
+
+      return result.slice(0, 10);
+    }
+
+    function syncLiveAndRenderTracks(force = false) {
+      const combined = buildCombinedTrackList();
+      renderTracksDOM(combined, lastFmTotal, force);
+    }
+
+    function refreshRelativeTimeLabels(rowEl, tracks) {
+      if (!rowEl) return;
+      for (let idx = 0; idx < tracks.length; idx++) {
+        const track = tracks[idx];
+        if (track.isNow) continue;
+        const metaTop = rowEl.children[idx]?._refs?.metaTop;
+        if (metaTop) {
+          const relText = getRelativeTime(track.uts);
+          if (metaTop.textContent !== relText) {
+            metaTop.innerHTML = `<span>${escapeHTML(relText)}</span>`;
+          }
+        }
+      }
+    }
+
+    function renderTracksDOM(list, totalScrobbles, force = false) {
+      if (totalScrobbles && DOM.lastfmStats) {
+        const formatted = `${Number(totalScrobbles).toLocaleString()} scrobbles`;
+        if (DOM.lastfmStats.textContent !== formatted) DOM.lastfmStats.textContent = formatted;
+      }
+      if (!Array.isArray(list) || list.length === 0) return;
+
+      const tracks = list.slice(0, 10);
+      const sig = tracks
+        .map(t => `${t.name}:${t.artist}:${t.isNow ? `NOW_${t.app || "spotify"}` : t.uts}:${t.art || ""}`)
+        .join("|");
+
+      let rowEl = DOM.lastfmGrid.firstElementChild;
+      if (!force && sig === lastTracksSig && rowEl) {
+        refreshRelativeTimeLabels(rowEl, tracks);
+        return;
+      }
+      lastTracksSig = sig;
+
+      const rowHasLive = tracks.some(t => t.isNow);
+      if (!rowEl) {
+        rowEl = document.createElement("div");
+        DOM.lastfmGrid.replaceChildren(rowEl);
+      }
+      rowEl.className = `plays-row${rowHasLive ? " has-live" : ""}`;
+
+      while (rowEl.children.length > tracks.length) {
+        rowEl.lastElementChild.remove();
+      }
+      while (rowEl.children.length < tracks.length) {
+        const card = document.createElement("a");
+        card.className = "play-card";
+        card.target = "_blank";
+        card.rel = "noopener noreferrer";
+        card.innerHTML = `
+          <img class="play-bg" alt="" decoding="async" />
+          <span class="play-live-pip" style="display:none;"></span>
+          <div class="play-expanded">
+            <img class="play-thumb" alt="" decoding="async" />
+            <div class="play-meta">
+              <div class="play-meta-top"></div>
+              <div class="play-title"></div>
+              <div class="play-artist"></div>
+            </div>
+          </div>
+          <div class="play-progress" style="display:none;"></div>
+        `;
+        const bgImg = card.querySelector(".play-bg");
+        const thumbImg = card.querySelector(".play-thumb");
+        bgImg.onerror = () => { bgImg.src = DEFAULT_VINYL_SVG; };
+        thumbImg.onerror = () => { thumbImg.src = DEFAULT_VINYL_SVG; };
+        card._refs = {
+          bgImg,
+          thumbImg,
+          pip: card.querySelector(".play-live-pip"),
+          metaTop: card.querySelector(".play-meta-top"),
+          titleEl: card.querySelector(".play-title"),
+          artistEl: card.querySelector(".play-artist"),
+          progEl: card.querySelector(".play-progress")
+        };
+        rowEl.appendChild(card);
+      }
+
+      liveProgressEl = null;
+
+      for (let idx = 0; idx < tracks.length; idx++) {
+        const track = tracks[idx];
+        const card = rowEl.children[idx];
+        const { bgImg, thumbImg, pip, metaTop, titleEl, artistEl, progEl } = card._refs;
+        const isNow = Boolean(track.isNow);
+        const rawName = track.name || "Unknown Track";
+        const rawArtist = track.artist || "Unknown Artist";
+        const trackUrl = track.url || `https://www.last.fm/user/${LASTFM_USERNAME}`;
+
+        const directArt = track.art || getCachedTrackArt(rawArtist, rawName) || "";
+        const targetImg = directArt || DEFAULT_VINYL_SVG;
+        const isLightCached = directArt ? Boolean(coverLuminanceCache.get(directArt)) : false;
+
+        card.className = `play-card${isNow ? " now-playing" : ""}${isLightCached ? " light-bg" : ""}`;
+        if (card.getAttribute("href") !== trackUrl) card.href = trackUrl;
+
+        const trackKey = getTrackCacheKey(rawArtist, rawName);
+        card.dataset.trackKey = trackKey;
+        card.dataset.artUrl = directArt;
+
+        if (bgImg.getAttribute("src") !== targetImg) bgImg.src = targetImg;
+        if (thumbImg.getAttribute("src") !== targetImg) thumbImg.src = targetImg;
+
+        if (directArt) {
+          applyCardCoverLuminance(card, directArt);
+        } else {
+          fetchTrackCoverUrl(rawArtist, rawName).then(resolvedUrl => {
+            if (resolvedUrl && card.dataset.trackKey === trackKey) {
+              card.dataset.artUrl = resolvedUrl;
+              bgImg.src = resolvedUrl;
+              thumbImg.src = resolvedUrl;
+              applyCardCoverLuminance(card, resolvedUrl);
+            }
+          });
+        }
+
+        pip.style.display = isNow ? "block" : "none";
+
+        const statusHTML = isNow
+          ? `<span class="play-now-badge"><span class="eq-bars"><span></span><span></span><span></span></span>${getListeningAppIconHTML(track.app)}</span>`
+          : `<span>${escapeHTML(getRelativeTime(track.uts))}</span>`;
+
+        if (metaTop.innerHTML !== statusHTML) metaTop.innerHTML = statusHTML;
+        if (titleEl.textContent !== rawName) titleEl.textContent = rawName;
+        if (artistEl.textContent !== rawArtist) artistEl.textContent = rawArtist;
+
+        if (isNow && track.timestamps?.start && track.timestamps?.end) {
+          progEl.style.display = "block";
+          liveProgressEl = progEl;
+        } else {
+          progEl.style.display = "none";
+        }
+      }
+
+      startProgressLoop();
+    }
+
+    let lastLfmPayloadSig = "";
+    function applyLastFmPayload(data) {
+      if (!data) return;
+      const total = data?.recenttracks?.["@attr"]?.total;
+      let tracks = data?.recenttracks?.track || [];
+      if (!Array.isArray(tracks)) tracks = [tracks];
+      const sliced = tracks.slice(0, 12);
+      const sig = `${total}:${sliced.map(t => `${t?.name}:${t?.date?.uts || "NOW"}`).join("|")}`;
+      if (sig === lastLfmPayloadSig) {
+        const rowEl = DOM.lastfmGrid.firstElementChild;
+        if (rowEl) refreshRelativeTimeLabels(rowEl, buildCombinedTrackList());
+        return;
+      }
+      lastLfmPayloadSig = sig;
+      lastFmTracks = sliced;
+      if (total) lastFmTotal = total;
+      syncLiveAndRenderTracks();
+      saveCache({ tracks: lastFmTracks, totalScrobbles: lastFmTotal });
+    }
+
+    let isFetchingLastFm = false;
+    async function fetchLastFmGrid(force = false) {
+      if ((document.hidden && !force) || isFetchingLastFm) return;
+      isFetchingLastFm = true;
+      try {
+        const data = await fetchJson(
+          `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${encodeURIComponent(LASTFM_USERNAME)}&api_key=${LASTFM_API_KEY}&format=json&limit=10`,
+          true
+        );
+        if (data) applyLastFmPayload(data);
+      } finally {
+        isFetchingLastFm = false;
+      }
+    }
+
+    let siteRevealed = false;
+    function revealSite() {
+      if (siteRevealed) return;
+      siteRevealed = true;
+      const elapsed = performance.now() - BOOT_START;
+      const waitMs = Math.max(0, BOOT_MIN_MS - elapsed);
+
+      setTimeout(() => {
+        if (DOM.loader && !DOM.loader.classList.contains("hidden")) {
+          DOM.loader.classList.add("hidden");
+          document.body.classList.add("loaded");
+          setTimeout(() => DOM.loader.remove(), 750);
+        }
+      }, waitMs);
+    }
+
+    (async function init() {
+      const hasCachedState = Boolean(stateCache.dstnUser || stateCache.presence);
+      if (stateCache.dstnUser) updateUserHeader(stateCache.dstnUser, stateCache.dstnFull);
+      if (stateCache.bio) renderDiscordBio(stateCache.bio);
+      if (stateCache.badges) renderDiscordBadges(stateCache.badges);
+      if (stateCache.presence) applyPresenceData(stateCache.presence);
+      else renderActivityFeed([]);
+      if (stateCache.cloud) applyCloudServer(stateCache.cloud.guild, stateCache.cloud.online, stateCache.cloud.members);
+      if (lastFmTracks.length > 0) syncLiveAndRenderTracks();
+
+      if (hasCachedState) revealSite();
+
+      const pLanyard = EARLY.lanyard.then(res => { if (res?.data) applyPresenceData(res.data); });
+      const pDstn = EARLY.dstn.then(data => { if (data) applyDstnPayload(data); });
+      const pLastFm = EARLY.lastfm.then(data => { if (data) applyLastFmPayload(data); });
+      EARLY.invite.then(d => {
+        if (d?.guild) {
+          applyCloudServer(d.guild, d.approximate_presence_count, d.approximate_member_count);
+          saveCache({ cloud: { guild: d.guild, online: d.approximate_presence_count, members: d.approximate_member_count } });
+        }
+      });
+
+      connectLanyardWS();
+
+      if (!hasCachedState) {
+        await Promise.race([
+          Promise.allSettled([pLanyard, pDstn, pLastFm]),
+          new Promise(r => setTimeout(r, 480))
+        ]);
+        revealSite();
+      }
+
+      setInterval(() => fetchLastFmGrid(), 5000);
+      setInterval(() => fetchDiscordProfile(), 10000);
+      setInterval(() => {
+        if (!document.hidden && (!wsSupported || !socket || socket.readyState !== WebSocket.OPEN)) {
+          fetchLanyardFastREST();
+        }
+      }, 3500);
+
+      window.addEventListener("online", () => {
+        connectLanyardWS();
+        fetchLanyardFastREST();
+        fetchDiscordProfile();
+        fetchLastFmGrid(true);
+      });
+
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) {
+          startProgressLoop();
+          fetchLanyardFastREST();
+          fetchDiscordProfile();
+          fetchLastFmGrid(true);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

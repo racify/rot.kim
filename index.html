@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#060203" />
+  <meta name="theme-color" content="#050505" />
   <title>rot.kim</title>
-  <link id="dynamic-favicon" rel="icon" href="favicon.png" type="image/png" />
+  <link rel="icon" href="favicon.png" type="image/png" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -18,32 +18,11 @@
   <link rel="preconnect" href="https://itunes.apple.com" crossorigin />
 
   <script>
-    /* Dynamic Domain Tab Title (e.g. https://gothgirls.lol -> gothgirls.lol, https://rot.kim/ -> rot.kim) */
-    (function setDomainTabTitle() {
-      try {
-        const rawHost = (window.location.hostname || window.location.host || "")
-          .replace(/^https?:\/\//i, "")
-          .replace(/^www\./i, "")
-          .replace(/\/+$/, "")
-          .trim();
-        if (rawHost) {
-          document.title = rawHost;
-        } else {
-          const fallbackHost = String(window.location.href || "")
-            .replace(/^https?:\/\//i, "")
-            .replace(/^www\./i, "")
-            .split(/[/?#]/)[0]
-            .trim();
-          if (fallbackHost) document.title = fallbackHost;
-        }
-      } catch {}
-    })();
-
     const DISCORD_ID = "488047218138546179";
     const CLOUD_INVITE = "rKZGYvmUUC";
     const LASTFM_API_KEY = "56f986f70954d1ad8c8b3ec3aec33f83";
     const LASTFM_USERNAME = "renumerate";
-    const BG_MEDIA_URL = "bg.png"; // Supports .png, .jpg, .jpeg, .webp, .gif, .avif, .svg, .mp4, .webm, .ogg, .mov
+    const BG_MEDIA_URL = "bg.png";
     const BG_FALLBACK_CANDIDATES = [
       "bg.png",
       "bg.jpg",
@@ -97,41 +76,40 @@
 
   <style>
     :root {
-      /* Deep Obsidian-Ruby Background & Luxury Dark Surfaces */
-      --bg: #060203;
-      --surface: rgba(16, 6, 9, 0.76);
-      --surface-glass: linear-gradient(145deg, rgba(251, 113, 133, 0.08) 0%, rgba(225, 29, 72, 0.02) 100%);
-      --border: rgba(255, 255, 255, 0.085);
-      --border-hover: rgba(225, 29, 72, 0.44);
-      --glass-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 0 rgba(225, 29, 72, 0.06), inset 0 0 0 1px rgba(255, 255, 255, 0.025);
-      --glass-ruby-highlight: inset 0 1px 0 0 rgba(254, 205, 211, 0.34), inset 0 -1px 0 0 rgba(225, 29, 72, 0.16), inset 0 0 0 1px rgba(244, 63, 94, 0.14);
-      --text-strong: #fdf4f6;
-      --text-main: #efe1e5;
-      --text-muted: #9a848b;
+      /* Liquid Glass & Onyx Surfaces */
+      --bg: #050505;
+      --surface: #0b0b0d;
+      --surface-glass: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.018) 100%);
+      --border: rgba(255, 255, 255, 0.09);
+      --border-hover: rgba(212, 175, 55, 0.42);
+      --glass-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 0 rgba(255, 255, 255, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+      --glass-gold-highlight: inset 0 1px 0 0 rgba(250, 224, 132, 0.36), inset 0 -1px 0 0 rgba(234, 88, 12, 0.22), inset 0 0 0 1px rgba(212, 175, 55, 0.18);
+      --text-strong: #fafafa;
+      --text-main: #e4e4e7;
+      --text-muted: #8e8e93;
 
-      /* Luxury Dark Imperial Ruby Jewel Theme */
-      --accent-deep: #4c0519;
-      --accent-mid: #9f1239;
-      --accent: #e11d48;
-      --accent-rich: #f43f5e;
-      --accent-bright: #fb7185;
-      --accent-shimmer: #fecdd3;
-      --accent-gradient: linear-gradient(90deg, #4c0519 0%, #9f1239 28%, #e11d48 62%, #fb7185 88%, #fecdd3 100%);
-      --accent-border: rgba(225, 29, 72, 0.48);
-      --accent-border-strong: rgba(251, 113, 133, 0.78);
-      --accent-glow: rgba(225, 29, 72, 0.58);
-      --accent-glow-soft: rgba(244, 63, 94, 0.26);
-      --accent-ambient: rgba(225, 29, 72, 0.16);
+      /* Seamless Sunset Orange & 24K Metallic Gold Palette */
+      --accent-orange-deep: #c2410c;
+      --accent-orange: #ea580c;
+      --accent-amber: #f59e0b;
+      --accent-gold: #d4af37;
+      --accent-gold-bright: #f5d061;
+      --accent-gold-shimmer: #fae084;
+      --accent-gradient: linear-gradient(135deg, #ea580c 0%, #f59e0b 38%, #d4af37 72%, #fae084 100%);
+      --accent-gradient-horiz: linear-gradient(90deg, #ea580c 0%, #f59e0b 38%, #d4af37 74%, #fae084 100%);
+      --accent-border: rgba(212, 175, 55, 0.48);
+      --accent-border-strong: rgba(245, 208, 97, 0.76);
+      --accent-glow: rgba(245, 158, 11, 0.48);
+      --accent-glow-soft: rgba(212, 175, 55, 0.22);
+      --accent-ambient: rgba(234, 88, 12, 0.14);
 
-      --tag-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.075), rgba(225, 29, 72, 0.055));
-      --tag-border: rgba(251, 113, 133, 0.17);
+      --tag-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(212, 175, 55, 0.05), rgba(234, 88, 12, 0.04));
+      --tag-border: rgba(255, 255, 255, 0.13);
 
-      /* Ultra-Smooth Non-Snappy Easing Curves */
-      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-      --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
-      --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+      /* Calm, Silk-Smooth Easing Curve (Zero Snap) */
+      --ease-calm: cubic-bezier(0.25, 0.8, 0.25, 1);
 
-      --cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M5.25 1.5h1.5v3.75h3.75v1.5H6.75v3.75h-1.5V6.75H1.5v-1.5h3.75V1.5z' fill='%23fb7185'/%3E%3C/svg%3E") 6 6, crosshair;
+      --cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cdefs%3E%3ClinearGradient id='c' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23fae084'/%3E%3Cstop offset='55%25' stop-color='%23d4af37'/%3E%3Cstop offset='100%25' stop-color='%23ea580c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M5.25 1.5h1.5v3.75h3.75v1.5H6.75v3.75h-1.5V6.75H1.5v-1.5h3.75V1.5z' fill='url(%23c)'/%3E%3C/svg%3E") 6 6, crosshair;
     }
 
     * {
@@ -146,9 +124,9 @@
     }
 
     ::selection {
-      background: rgba(225, 29, 72, 0.32);
-      color: #fff1f2;
-      -webkit-text-fill-color: #fff1f2;
+      background: rgba(212, 175, 55, 0.28);
+      color: #fff7ed;
+      -webkit-text-fill-color: #fff7ed;
     }
 
     img, video, svg, .status-dot, .play-live-pip, .eq-bars {
@@ -183,18 +161,18 @@
       position: relative;
     }
 
-    /* Fullscreen Obsidian-Ruby Boot Loader with Pulsing Ruby Dot */
+    /* Fullscreen Onyx Boot Loader with Orange & 24K Gold Dot */
     #boot-loader {
       position: fixed;
       inset: 0;
       z-index: 9999;
-      background-color: #060203;
+      background-color: #050505;
       display: flex;
       align-items: center;
       justify-content: center;
       opacity: 1;
       visibility: visible;
-      transition: opacity 0.78s var(--ease-out), visibility 0.78s var(--ease-out);
+      transition: opacity 0.85s var(--ease-calm), visibility 0.85s var(--ease-calm);
       contain: strict;
     }
 
@@ -208,17 +186,17 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, var(--accent-shimmer), var(--accent));
-      box-shadow: 0 0 14px rgba(251, 113, 133, 0.82), 0 0 30px rgba(225, 29, 72, 0.54);
-      animation: dotPulse 1.25s var(--ease-in-out) infinite alternate;
+      background: var(--accent-gradient);
+      box-shadow: 0 0 14px rgba(250, 224, 132, 0.7), 0 0 28px rgba(234, 88, 12, 0.5);
+      animation: dotPulse 1.4s var(--ease-calm) infinite alternate;
     }
 
     @keyframes dotPulse {
-      0% { transform: scale(0.72); opacity: 0.35; }
-      100% { transform: scale(1.18); opacity: 1; }
+      0% { transform: scale(0.76); opacity: 0.4; }
+      100% { transform: scale(1.16); opacity: 1; }
     }
 
-    /* Background Image / Video — Pure Compositor Layer */
+    /* Frosted Liquid Glass Background Layer */
     .bg-media-wrap {
       position: fixed;
       inset: 0;
@@ -226,7 +204,7 @@
       pointer-events: none;
       overflow: hidden;
       opacity: 0;
-      transition: opacity 1.2s var(--ease-out);
+      transition: opacity 1.25s var(--ease-calm);
       contain: strict;
     }
 
@@ -238,7 +216,8 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transform: translateZ(0);
+      filter: saturate(1.14) contrast(1.04);
+      transform: translateZ(0) scale(1.02);
       display: none;
     }
 
@@ -249,7 +228,14 @@
     .bg-media-overlay {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at center, rgba(12, 3, 5, 0.68) 0%, rgba(6, 2, 3, 0.95) 100%);
+      backdrop-filter: blur(20px) saturate(165%) contrast(106%) brightness(0.62);
+      -webkit-backdrop-filter: blur(20px) saturate(165%) contrast(106%) brightness(0.62);
+      background:
+        radial-gradient(120% 90% at 18% 12%, rgba(250, 224, 132, 0.06) 0%, transparent 55%),
+        radial-gradient(120% 90% at 82% 88%, rgba(234, 88, 12, 0.06) 0%, transparent 55%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.045) 0%, rgba(12, 12, 15, 0.48) 45%, rgba(5, 5, 5, 0.82) 100%),
+        radial-gradient(circle at center, rgba(8, 8, 10, 0.38) 0%, rgba(5, 5, 5, 0.86) 100%);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
     }
 
     /* Main Container */
@@ -264,7 +250,7 @@
       gap: 21px;
       opacity: 0;
       transform: translateY(8px);
-      transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
+      transition: opacity 0.95s var(--ease-calm), transform 0.95s var(--ease-calm);
     }
 
     body.loaded .page-wrap {
@@ -304,14 +290,14 @@
       border-radius: 50%;
       object-fit: cover;
       background: var(--surface);
-      box-shadow: var(--glass-highlight), 0 6px 18px rgba(0, 0, 0, 0.48);
+      box-shadow: var(--glass-highlight), 0 6px 18px rgba(0, 0, 0, 0.45);
       display: block;
-      transition: transform 0.72s var(--ease-out), box-shadow 0.72s var(--ease-out);
+      transition: transform 0.75s var(--ease-calm), box-shadow 0.75s var(--ease-calm);
     }
 
     .avatar-wrap:hover .avatar-img {
-      transform: scale(1.03);
-      box-shadow: var(--glass-ruby-highlight), 0 8px 24px rgba(0, 0, 0, 0.58), 0 0 20px var(--accent-ambient);
+      transform: scale(1.025);
+      box-shadow: var(--glass-gold-highlight), 0 8px 22px rgba(0, 0, 0, 0.55), 0 0 18px var(--accent-ambient);
     }
 
     .avatar-deco {
@@ -338,7 +324,7 @@
       align-items: center;
       justify-content: center;
       z-index: 3;
-      transition: transform 0.6s var(--ease-out);
+      transition: transform 0.65s var(--ease-calm);
     }
 
     .status-dot svg {
@@ -360,11 +346,11 @@
       color: var(--text-strong);
       letter-spacing: -0.025em;
       line-height: 1.2;
-      transition: color 0.52s var(--ease-out);
+      transition: color 0.65s var(--ease-calm);
     }
 
     .display-name.has-gradient {
-      background: linear-gradient(var(--name-angle, 90deg), var(--color-1, #ffffff), var(--color-2, var(--accent-bright)));
+      background: linear-gradient(var(--name-angle, 90deg), var(--color-1, #ffffff), var(--color-2, var(--accent-gold-bright)));
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -390,26 +376,19 @@
       color: var(--text-muted);
     }
 
-    /* Smooth Width-Transitioning Handle Copy so Nitro Badge / Clan Tag Slides Aside Without Overlapping */
+    /* Handle Copy with Smooth Width Expansion so Badges Glide Without Overlapping */
     .handle-copy {
       position: relative;
       display: inline-flex;
       align-items: center;
-      width: var(--w-normal, auto);
       color: var(--text-muted);
       font-weight: 400;
-      overflow: visible;
-      flex-shrink: 0;
-      transition: width 0.65s var(--ease-out), color 0.52s var(--ease-out);
+      transition: width 0.68s var(--ease-calm), color 0.65s var(--ease-calm);
       will-change: width;
     }
 
-    .handle-copy.copied {
-      width: var(--w-copied, auto);
-    }
-
     .handle-copy:hover {
-      color: var(--accent-bright);
+      color: var(--accent-gold-bright);
     }
 
     .handle-text {
@@ -417,7 +396,7 @@
       white-space: nowrap;
       opacity: 1;
       transform: translateY(0) scale(1);
-      transition: transform 0.62s var(--ease-out), opacity 0.56s var(--ease-out);
+      transition: transform 0.65s var(--ease-calm), opacity 0.65s var(--ease-calm);
     }
 
     .handle-copied {
@@ -428,18 +407,27 @@
       align-items: center;
       gap: 4px;
       white-space: nowrap;
-      color: var(--accent-bright);
-      text-shadow: 0 0 12px var(--accent-glow-soft);
+      background: var(--accent-gradient-horiz);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: var(--accent-gold-bright);
+      filter: drop-shadow(0 0 10px var(--accent-glow-soft));
       font-weight: 500;
       opacity: 0;
-      transform: translateY(calc(-50% + 5px)) scale(0.96);
+      transform: translateY(calc(-50% + 4px)) scale(0.97);
       pointer-events: none;
-      transition: transform 0.62s var(--ease-out), opacity 0.56s var(--ease-out);
+      transition: transform 0.65s var(--ease-calm), opacity 0.65s var(--ease-calm);
+    }
+
+    .handle-copied svg {
+      stroke: var(--accent-amber);
+      flex-shrink: 0;
     }
 
     .handle-copy.copied .handle-text {
       opacity: 0;
-      transform: translateY(-5px) scale(0.96);
+      transform: translateY(-4px) scale(0.97);
     }
 
     .handle-copy.copied .handle-copied {
@@ -455,22 +443,21 @@
       border-radius: 6px;
       background: var(--tag-bg);
       border: 1px solid var(--tag-border);
-      box-shadow: var(--glass-highlight), 0 4px 12px rgba(0, 0, 0, 0.32);
-      backdrop-filter: blur(8px) saturate(140%);
-      -webkit-backdrop-filter: blur(8px) saturate(140%);
+      box-shadow: var(--glass-highlight), 0 4px 12px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(12px) saturate(150%);
+      -webkit-backdrop-filter: blur(12px) saturate(150%);
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
       font-weight: 500;
       color: var(--text-main);
       letter-spacing: -0.01em;
       line-height: 1.3;
-      transition: border-color 0.62s var(--ease-out), box-shadow 0.62s var(--ease-out), transform 0.65s var(--ease-out);
+      transition: border-color 0.68s var(--ease-calm), box-shadow 0.68s var(--ease-calm), transform 0.68s var(--ease-calm);
     }
 
     .clan-tag:hover {
       border-color: var(--accent-border);
-      box-shadow: var(--glass-ruby-highlight), 0 4px 14px rgba(0, 0, 0, 0.38), 0 0 14px var(--accent-ambient);
-      transform: translateY(-1px);
+      box-shadow: var(--glass-gold-highlight), 0 4px 14px rgba(0, 0, 0, 0.35), 0 0 12px var(--accent-ambient);
     }
 
     .clan-tag-icon {
@@ -485,25 +472,21 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      transition: transform 0.65s var(--ease-out);
     }
 
     .discord-badges:empty { display: none; }
 
-    /* Nitro & All Discord Badges: Smooth Hover Tilt + Scale + Ruby Glow */
     .discord-badge-icon {
       width: 18px;
       height: 18px;
       object-fit: contain;
       display: block;
-      transform-origin: center center;
-      will-change: transform, filter;
-      transition: transform 0.68s var(--ease-out), filter 0.68s var(--ease-out);
+      transition: transform 0.65s var(--ease-calm), filter 0.65s var(--ease-calm);
     }
 
     .discord-badge-icon:hover {
-      transform: translateY(-2px) scale(1.16) rotate(-8deg);
-      filter: drop-shadow(0 4px 10px var(--accent-glow));
+      transform: translateY(-1px) scale(1.06);
+      filter: drop-shadow(0 2px 6px var(--accent-glow-soft));
     }
 
     .bio-line {
@@ -550,12 +533,12 @@
       gap: 5px;
       color: var(--text-muted);
       text-decoration: none;
-      transition: color 0.56s var(--ease-out), transform 0.56s var(--ease-out);
+      transition: color 0.65s var(--ease-calm), transform 0.65s var(--ease-calm);
     }
 
     .sec-head-right:hover {
-      color: var(--accent-bright);
-      transform: translateX(2px);
+      color: var(--accent-gold-bright);
+      transform: translateX(1.5px);
     }
 
     /* Project Row */
@@ -565,11 +548,11 @@
       gap: 12px;
       text-decoration: none;
       padding: 2px 0;
-      transition: transform 0.65s var(--ease-out);
+      transition: transform 0.72s var(--ease-calm);
     }
 
     .project-row:hover {
-      transform: translateX(4px);
+      transform: translateX(3px);
     }
 
     .project-icon {
@@ -579,14 +562,14 @@
       object-fit: cover;
       background: var(--surface);
       border: 1px solid var(--border);
-      box-shadow: var(--glass-highlight), 0 4px 12px rgba(0, 0, 0, 0.38);
+      box-shadow: var(--glass-highlight), 0 4px 12px rgba(0, 0, 0, 0.36);
       flex-shrink: 0;
-      transition: border-color 0.65s var(--ease-out), box-shadow 0.65s var(--ease-out), transform 0.65s var(--ease-out);
+      transition: border-color 0.72s var(--ease-calm), box-shadow 0.72s var(--ease-calm), transform 0.72s var(--ease-calm);
     }
 
     .project-row:hover .project-icon {
       border-color: var(--accent-border);
-      box-shadow: var(--glass-ruby-highlight), 0 6px 16px rgba(0, 0, 0, 0.5), 0 0 16px var(--accent-ambient);
+      box-shadow: var(--glass-gold-highlight), 0 6px 16px rgba(0, 0, 0, 0.48), 0 0 14px var(--accent-ambient);
     }
 
     .project-info {
@@ -604,11 +587,11 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      transition: color 0.56s var(--ease-out);
+      transition: color 0.65s var(--ease-calm);
     }
 
     .project-row:hover .project-title {
-      color: var(--accent-bright);
+      color: var(--accent-gold-bright);
     }
 
     .project-desc {
@@ -617,7 +600,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      transition: color 0.56s var(--ease-out);
+      transition: color 0.65s var(--ease-calm);
     }
 
     /* Activity List */
@@ -634,7 +617,7 @@
       gap: 12px;
       min-height: 26px;
       font-size: 13px;
-      transition: transform 0.6s var(--ease-out);
+      transition: transform 0.68s var(--ease-calm);
     }
 
     .activity-left {
@@ -658,12 +641,12 @@
       display: grid;
       place-items: center;
       color: var(--text-muted);
-      transition: border-color 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out);
+      transition: border-color 0.68s var(--ease-calm), box-shadow 0.68s var(--ease-calm);
     }
 
     .activity-row:hover .activity-icon {
       border-color: var(--border-hover);
-      box-shadow: var(--glass-ruby-highlight);
+      box-shadow: var(--glass-gold-highlight);
     }
 
     .activity-text {
@@ -681,7 +664,7 @@
       letter-spacing: -0.015em;
       color: var(--text-strong);
       flex-shrink: 0;
-      transition: color 0.56s var(--ease-out);
+      transition: color 0.65s var(--ease-calm);
     }
 
     .activity-detail {
@@ -714,15 +697,15 @@
       justify-content: center;
       color: var(--text-muted);
       text-decoration: none;
-      transition: color 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+      transition: color 0.65s var(--ease-calm), transform 0.65s var(--ease-calm);
     }
 
     a.activity-link-arrow:hover {
-      color: var(--accent-bright);
+      color: var(--accent-gold-bright);
       transform: translate(2px, -2px);
     }
 
-    /* Recent Plays — Single Row of 10 (Obsidian Glass & Imperial Ruby Theme) */
+    /* Recent Plays — Single Row of 10 (Solid Opaque Cards, Calm Transitions, Orange & 24K Gold) */
     .plays-stack {
       display: flex;
       flex-direction: column;
@@ -735,7 +718,7 @@
       gap: 5px;
       height: 48px;
       width: 100%;
-      transition: height 0.72s var(--ease-out);
+      transition: height 0.82s var(--ease-calm);
     }
 
     .plays-row.has-live,
@@ -756,11 +739,11 @@
       text-decoration: none;
       display: flex;
       align-items: center;
-      transition: flex-grow 0.76s var(--ease-out),
-                  border-color 0.62s var(--ease-out),
-                  box-shadow 0.62s var(--ease-out),
-                  opacity 0.62s var(--ease-out),
-                  transform 0.62s var(--ease-out);
+      opacity: 1;
+      transition: flex-grow 0.85s var(--ease-calm),
+                  border-color 0.72s var(--ease-calm),
+                  box-shadow 0.72s var(--ease-calm),
+                  transform 0.72s var(--ease-calm);
     }
 
     .play-card::after {
@@ -768,33 +751,29 @@
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(225, 29, 72, 0.045) 45%, transparent 100%);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(212, 175, 55, 0.04) 45%, rgba(234, 88, 12, 0.03) 100%);
       pointer-events: none;
       z-index: 2;
-      transition: opacity 0.62s var(--ease-out);
+      transition: opacity 0.72s var(--ease-calm);
     }
 
     .play-card.now-playing {
       border-color: var(--accent-border-strong);
-      box-shadow: var(--glass-ruby-highlight), 0 8px 22px rgba(0, 0, 0, 0.64), 0 0 18px var(--accent-glow-soft);
+      box-shadow: var(--glass-gold-highlight), 0 8px 22px rgba(0, 0, 0, 0.62), 0 0 18px var(--accent-glow-soft);
     }
 
-    .plays-row.has-live:not(:hover) .play-card.now-playing,
+    .plays-row.has-live:not(:has(.play-card:hover)) .play-card.now-playing,
     .play-card:hover {
       flex-grow: 6.5;
       border-color: var(--accent-border);
-      box-shadow: var(--glass-ruby-highlight), 0 12px 28px rgba(0, 0, 0, 0.74), 0 0 20px var(--accent-ambient);
+      box-shadow: var(--glass-gold-highlight), 0 12px 28px rgba(0, 0, 0, 0.72), 0 0 18px var(--accent-ambient);
       z-index: 5;
     }
 
-    .plays-row.has-live:not(:hover) .play-card.now-playing,
+    .plays-row.has-live:not(:has(.play-card:hover)) .play-card.now-playing,
     .play-card.now-playing:hover {
       border-color: var(--accent-border-strong);
-      box-shadow: var(--glass-ruby-highlight), 0 12px 28px rgba(0, 0, 0, 0.76), 0 0 24px var(--accent-glow-soft);
-    }
-
-    .plays-row:hover .play-card:not(:hover) {
-      opacity: 0.54;
+      box-shadow: var(--glass-gold-highlight), 0 12px 28px rgba(0, 0, 0, 0.74), 0 0 24px var(--accent-glow-soft);
     }
 
     .play-bg {
@@ -805,21 +784,21 @@
       object-fit: cover;
       backface-visibility: hidden;
       transform: translateZ(0) scale(1.01);
-      transition: transform 0.82s var(--ease-out), filter 0.68s var(--ease-out);
+      transition: transform 0.92s var(--ease-calm), filter 0.82s var(--ease-calm);
       display: block;
     }
 
-    .plays-row.has-live:not(:hover) .play-card.now-playing .play-bg,
+    .plays-row.has-live:not(:has(.play-card:hover)) .play-card.now-playing .play-bg,
     .play-card:hover .play-bg {
-      filter: brightness(0.24) blur(7px) saturate(1.14);
-      transform: translateZ(0) scale(1.11);
+      filter: brightness(0.26) blur(7px) saturate(1.14);
+      transform: translateZ(0) scale(1.1);
     }
 
     /* Adaptive Light Song Background Mode */
-    .plays-row.has-live:not(:hover) .play-card.now-playing.light-bg .play-bg,
+    .plays-row.has-live:not(:has(.play-card:hover)) .play-card.now-playing.light-bg .play-bg,
     .play-card.light-bg:hover .play-bg {
       filter: brightness(0.84) blur(7px) saturate(1.08);
-      transform: translateZ(0) scale(1.11);
+      transform: translateZ(0) scale(1.1);
     }
 
     .play-live-pip {
@@ -829,13 +808,13 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, var(--accent-shimmer), var(--accent));
+      background: var(--accent-gradient);
       box-shadow: 0 0 9px var(--accent-glow);
       z-index: 3;
-      transition: opacity 0.52s var(--ease-out), transform 0.52s var(--ease-out);
+      transition: opacity 0.65s var(--ease-calm), transform 0.65s var(--ease-calm);
     }
 
-    .plays-row.has-live:not(:hover) .play-card.now-playing .play-live-pip,
+    .plays-row.has-live:not(:has(.play-card:hover)) .play-card.now-playing .play-live-pip,
     .play-card:hover .play-live-pip {
       opacity: 0;
       transform: scale(0.75);
@@ -851,13 +830,13 @@
       align-items: center;
       gap: 10px;
       opacity: 0;
-      transform: translateX(-5px);
+      transform: translateX(-4px);
       pointer-events: none;
-      transition: opacity 0.6s var(--ease-out), transform 0.66s var(--ease-out);
+      transition: opacity 0.68s var(--ease-calm), transform 0.75s var(--ease-calm);
       min-width: 0;
     }
 
-    .plays-row.has-live:not(:hover) .play-card.now-playing .play-expanded,
+    .plays-row.has-live:not(:has(.play-card:hover)) .play-card.now-playing .play-expanded,
     .play-card:hover .play-expanded {
       opacity: 1;
       transform: translateX(0);
@@ -871,9 +850,9 @@
       object-fit: cover;
       flex-shrink: 0;
       background: var(--surface);
-      border: 1px solid rgba(251, 113, 133, 0.26);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.54);
-      transition: transform 0.66s var(--ease-out), border-color 0.56s var(--ease-out);
+      border: 1px solid rgba(245, 208, 97, 0.24);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.52);
+      transition: transform 0.75s var(--ease-calm), border-color 0.68s var(--ease-calm);
     }
 
     .play-card.light-bg .play-thumb {
@@ -897,20 +876,20 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
       font-weight: 500;
-      color: rgba(254, 205, 211, 0.8);
+      color: rgba(250, 224, 132, 0.8);
       text-transform: uppercase;
       letter-spacing: 0.03em;
     }
 
     .play-card.light-bg .play-meta-top {
-      color: rgba(24, 6, 11, 0.74);
+      color: rgba(10, 10, 14, 0.68);
     }
 
     .play-now-badge {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      color: var(--accent-bright);
+      color: var(--accent-gold-bright);
       font-weight: 600;
     }
 
@@ -922,14 +901,14 @@
       flex-shrink: 0;
       color: #ffffff;
       fill: currentColor;
-      transition: color 0.52s var(--ease-out);
+      transition: color 0.6s var(--ease-calm);
     }
 
     .play-card.light-bg .play-app-icon {
       color: #000000;
     }
 
-    /* GPU-composited Equalizer Bars */
+    /* GPU-composited Equalizer Bars in 24K Gold & Orange Gradient */
     .eq-bars {
       display: inline-flex;
       align-items: flex-end;
@@ -940,21 +919,21 @@
     .eq-bars span {
       width: 2px;
       height: 9px;
-      background: linear-gradient(180deg, var(--accent-shimmer), var(--accent));
+      background: linear-gradient(180deg, var(--accent-gold-shimmer) 0%, var(--accent-gold) 48%, var(--accent-orange) 100%);
       border-radius: 1px;
       transform-origin: bottom center;
-      animation: eqBounce 0.88s var(--ease-in-out) infinite alternate;
+      animation: eqBounce 0.95s var(--ease-calm) infinite alternate;
     }
 
     .play-card.light-bg .eq-bars span {
-      background: linear-gradient(180deg, var(--accent-mid), var(--accent-deep));
+      background: linear-gradient(180deg, var(--accent-orange) 0%, var(--accent-orange-deep) 100%);
     }
 
-    .eq-bars span:nth-child(2) { animation-delay: 0.22s; }
-    .eq-bars span:nth-child(3) { animation-delay: 0.44s; }
+    .eq-bars span:nth-child(2) { animation-delay: 0.24s; }
+    .eq-bars span:nth-child(3) { animation-delay: 0.48s; }
 
     @keyframes eqBounce {
-      0% { transform: scaleY(0.24); }
+      0% { transform: scaleY(0.26); }
       100% { transform: scaleY(1); }
     }
 
@@ -970,7 +949,7 @@
     }
 
     .play-card.light-bg .play-title {
-      color: #0c0406;
+      color: #09090b;
     }
 
     .play-artist {
@@ -984,7 +963,7 @@
     }
 
     .play-card.light-bg .play-artist {
-      color: rgba(12, 4, 6, 0.74);
+      color: rgba(9, 9, 11, 0.74);
     }
 
     .play-progress {
@@ -993,7 +972,7 @@
       bottom: 0;
       height: 2px;
       width: 100%;
-      background: var(--accent-gradient);
+      background: var(--accent-gradient-horiz);
       box-shadow: 0 0 10px var(--accent-glow);
       z-index: 4;
       transform-origin: left center;
@@ -1028,11 +1007,11 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: color 0.6s var(--ease-out), transform 0.6s var(--ease-out), filter 0.6s var(--ease-out);
+      transition: color 0.65s var(--ease-calm), transform 0.65s var(--ease-calm), filter 0.65s var(--ease-calm);
     }
 
     .social-link:hover {
-      color: var(--accent-bright);
+      color: var(--accent-gold-bright);
       transform: translateY(-2px);
       filter: drop-shadow(0 3px 8px var(--accent-glow-soft));
     }
@@ -1095,11 +1074,11 @@
         <span>current project</span>
       </div>
 
-      <a id="cloud-project-row" href="https://discord.gg/rKZGYvmUUC" target="_blank" rel="noopener noreferrer" class="project-row">
+      <a href="https://discord.gg/rKZGYvmUUC" target="_blank" rel="noopener noreferrer" class="project-row">
         <img id="cloud-proj-icon" class="project-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" decoding="async" />
         <div class="project-info">
-          <span class="project-title" id="cloud-proj-name">moon men/span>
-          <span class="project-desc" id="cloud-proj-desc">owned by @rotkim/span>
+          <span class="project-title" id="cloud-proj-name">moon men</span>
+          <span class="project-desc" id="cloud-proj-desc">owned by @rotkim</span>
         </div>
       </a>
     </section>
@@ -1143,7 +1122,7 @@
     const BADGE_CDN_BASE = "https://cdn.jsdelivr.net/gh/mezotv/discord-badges@main/assets";
 
     const DEFAULT_VINYL_SVG =
-      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23fecdd3'/%3E%3Cstop offset='50%25' stop-color='%23e11d48'/%3E%3Cstop offset='100%25' stop-color='%234c0519'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='300' height='300' fill='%230c0507'/%3E%3Ccircle cx='150' cy='150' r='58' fill='none' stroke='%232d1219' stroke-width='6'/%3E%3Ccircle cx='150' cy='150' r='16' fill='url(%23g)'/%3E%3C/svg%3E";
+      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23fae084'/%3E%3Cstop offset='50%25' stop-color='%23d4af37'/%3E%3Cstop offset='100%25' stop-color='%23ea580c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='300' height='300' fill='%230a0a0c'/%3E%3Ccircle cx='150' cy='150' r='58' fill='none' stroke='%2327272a' stroke-width='6'/%3E%3Ccircle cx='150' cy='150' r='16' fill='url(%23g)'/%3E%3C/svg%3E";
 
     const MONO_MUSIC_SVGS = {
       spotify: `<svg class="play-app-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>`,
@@ -1170,8 +1149,8 @@
     };
 
     const STATUS_SVGS = {
-      online: '<svg viewBox="0 0 16 16"><defs><linearGradient id="stRuby" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fecdd3"/><stop offset="52%" stop-color="#e11d48"/><stop offset="100%" stop-color="#4c0519"/></linearGradient></defs><circle cx="8" cy="8" r="8" fill="url(#stRuby)"/></svg>',
-      idle: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#d97706"/></svg>',
+      online: '<svg viewBox="0 0 16 16"><defs><linearGradient id="stGold" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fae084"/><stop offset="50%" stop-color="#d4af37"/><stop offset="100%" stop-color="#ea580c"/></linearGradient></defs><circle cx="8" cy="8" r="8" fill="url(#stGold)"/></svg>',
+      idle: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#f59e0b"/></svg>',
       dnd: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#ef4444"/><rect x="3" y="6.5" width="10" height="3" rx="1.5" fill="var(--bg)"/></svg>',
       offline: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#52525b"/><circle cx="8" cy="8" r="4" fill="var(--bg)"/></svg>'
     };
@@ -1200,12 +1179,10 @@
     const CLOCK_SVG = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
     const PAD_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4m-2-2v4m7-1h.01M18 11h.01"/></svg>`;
 
-    /* Regex to detect any line containing a URL or domain link */
-    const LINE_LINK_REGEX = /(?:https?:\/\/|www\.|discord\.gg\/|discord\.com\/invite\/|\b[a-z0-9-]+\.(?:gg|com|net|org|io|me|co|tv|xyz|dev|app|lol|sh|to|fm|ly|link|bio|cc|kim)\b)/i;
+    const LINE_LINK_REGEX = /(?:https?:\/\/|www\.|discord\.gg\/|discord\.com\/invite\/|t\.me\/|\b[a-z0-9-]+\.(?:gg|com|net|org|io|me|co|tv|xyz|dev|app|lol|sh|to|fm|ly|link|bio|cc|kim)\b)/i;
 
     const scheduleIdle = window.requestIdleCallback || (cb => setTimeout(cb, 16));
 
-    /* Cached DOM References */
     const DOM = {
       loader: document.getElementById("boot-loader"),
       avatar: document.getElementById("avatar"),
@@ -1228,33 +1205,27 @@
       lastfmStats: document.getElementById("lastfm-stats-label")
     };
 
-    /* Measure handle and "copied" pill widths so the Nitro badge & clan tag smoothly slide aside */
-    function syncHandleCopyWidths() {
-      if (!DOM.statusText || !DOM.handleName || !DOM.handleCopied) return;
-      const normalW = Math.ceil(DOM.handleName.getBoundingClientRect().width);
-      const copiedW = Math.ceil(DOM.handleCopied.getBoundingClientRect().width) + 2;
-      if (normalW > 0) DOM.statusText.style.setProperty("--w-normal", `${normalW}px`);
-      if (copiedW > 0) DOM.statusText.style.setProperty("--w-copied", `${Math.max(normalW, copiedW)}px`);
+    /* Smooth Width Sync for Handle Copy so Adjacent Badges Glide Cleanly */
+    function syncHandleWidth(isCopied = DOM.statusText.classList.contains("copied")) {
+      const textW = Math.ceil(DOM.handleName.getBoundingClientRect().width);
+      const copiedW = Math.ceil(DOM.handleCopied.getBoundingClientRect().width);
+      if (!textW || !copiedW) return;
+      DOM.statusText.style.width = `${isCopied ? copiedW + 4 : textW}px`;
     }
 
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(syncHandleCopyWidths).catch(() => {});
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(() => syncHandleWidth());
     }
-    window.addEventListener("resize", syncHandleCopyWidths, { passive: true });
 
-    /* Background Image & Video Setup (Supports bg.png, all image types, and video formats) */
+    /* Background Image & Video Setup */
     (function initBackgroundMedia() {
       const wrap = document.getElementById("bg-media-wrap");
       const imgEl = document.getElementById("bg-image");
       const videoEl = document.getElementById("bg-video");
       if (!wrap || !imgEl || !videoEl) return;
 
-      const candidates = Array.from(
-        new Set([BG_MEDIA_URL, ...BG_FALLBACK_CANDIDATES].filter(Boolean))
-      );
-
+      const candidates = Array.from(new Set([BG_MEDIA_URL, ...BG_FALLBACK_CANDIDATES].filter(Boolean)));
       const isVideoUrl = url => /\.(mp4|webm|ogg|mov)(?:[?#]|$)/i.test(url);
-
       let idx = 0;
 
       function tryNext() {
@@ -1274,10 +1245,8 @@
             videoEl.play().catch(() => {});
           };
           videoEl.addEventListener("loadeddata", onVideoReady, { once: true });
-          videoEl.addEventListener("canplay", onVideoReady, { once: true });
           videoEl.addEventListener("error", () => {
             videoEl.removeEventListener("loadeddata", onVideoReady);
-            videoEl.removeEventListener("canplay", onVideoReady);
             tryNext();
           }, { once: true });
         } else {
@@ -1289,9 +1258,7 @@
             imgEl.classList.add("active");
             wrap.classList.add("ready");
           };
-          probe.onerror = () => {
-            tryNext();
-          };
+          probe.onerror = tryNext;
           probe.src = candidate;
         }
       }
@@ -1342,39 +1309,17 @@
     let lastDstnSig = "";
     let copyTimer = null;
 
-    function copyTextToClipboard(text) {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        return navigator.clipboard.writeText(text).catch(() => fallbackCopyText(text));
-      }
-      return fallbackCopyText(text);
-    }
-
-    function fallbackCopyText(text) {
-      return new Promise(resolve => {
-        try {
-          const ta = document.createElement("textarea");
-          ta.value = text;
-          ta.style.position = "fixed";
-          ta.style.opacity = "0";
-          ta.style.pointerEvents = "none";
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand("copy");
-          ta.remove();
-        } catch {}
-        resolve();
-      });
-    }
-
     DOM.statusText.addEventListener("click", function () {
-      syncHandleCopyWidths();
-      copyTextToClipboard(currentDiscordUsername).then(() => {
+      if (!navigator.clipboard) return;
+      navigator.clipboard.writeText(currentDiscordUsername).then(() => {
         clearTimeout(copyTimer);
         this.classList.add("copied");
+        syncHandleWidth(true);
         copyTimer = setTimeout(() => {
           this.classList.remove("copied");
+          syncHandleWidth(false);
         }, 1350);
-      });
+      }).catch(() => {});
     });
 
     function resolveBadgeAssets(b) {
@@ -1443,7 +1388,6 @@
       }
     }
 
-    /* Filter out any line in the bio that contains a link or domain */
     function renderDiscordBio(rawBio) {
       const cleanBio = String(rawBio || "")
         .split(/\r?\n/)
@@ -1468,7 +1412,6 @@
       );
     }
 
-    /* Preserve exact Display Name casing while keeping domain tab title intact */
     function updateUserHeader(user, fullProfileData = null) {
       if (!user) return;
       const rawName = (user.global_name || user.display_name || user.username || "zack").trim();
@@ -1492,28 +1435,28 @@
         currentDiscordUsername = user.username;
         if (DOM.handleName.textContent !== user.username) {
           DOM.handleName.textContent = user.username;
-          syncHandleCopyWidths();
+          syncHandleWidth();
         }
       }
 
       const uid = user.id || DISCORD_ID;
-            let defaultAvatarIdx = 0;
-            try {
-              const disc = String(user.discriminator || "0");
-              defaultAvatarIdx = disc !== "0" && disc !== "0000"
-                ? parseInt(disc, 10) % 5
-                : Number((BigInt(uid) >> 22n) % 6n);
-            } catch {}
-            const fallbackAvatar = `https://cdn.discordapp.com/embed/avatars/${defaultAvatarIdx}.png`;
+      let defaultAvatarIdx = 0;
+      try {
+        const disc = String(user.discriminator || "0");
+        defaultAvatarIdx = disc !== "0" && disc !== "0000"
+          ? parseInt(disc, 10) % 5
+          : Number((BigInt(uid) >> 22n) % 6n);
+      } catch {}
+      const fallbackAvatar = `https://cdn.discordapp.com/embed/avatars/${defaultAvatarIdx}.png`;
 
-            const avatarSrc = user.avatar
-              ? `https://cdn.discordapp.com/avatars/${uid}/${user.avatar}.${user.avatar.startsWith("a_") ? "gif" : "png"}?size=256`
-              : (user.avatar_url || user.default_avatar_url || fallbackAvatar);
+      const avatarSrc = user.avatar
+        ? `https://cdn.discordapp.com/avatars/${uid}/${user.avatar}.${user.avatar.startsWith("a_") ? "gif" : "png"}?size=256`
+        : fallbackAvatar;
 
-            DOM.avatar.onerror = () => {
-              if (DOM.avatar.src !== fallbackAvatar) DOM.avatar.src = fallbackAvatar;
-            };
-            if (DOM.avatar.src !== avatarSrc) DOM.avatar.src = avatarSrc;
+      DOM.avatar.onerror = () => {
+        if (DOM.avatar.src !== fallbackAvatar) DOM.avatar.src = fallbackAvatar;
+      };
+      if (DOM.avatar.src !== avatarSrc) DOM.avatar.src = avatarSrc;
 
       const asset = user.avatar_decoration_data?.asset;
       if (asset) {
@@ -1563,9 +1506,7 @@
       }
     }
 
-    /* ====================================================
-       RECENT PLAYS + DISCORD MUSIC SEAMLESS QUEUE
-       ==================================================== */
+    /* Recent Plays + Discord Music Seamless Queue */
     const rawArtworks = stateCache.artworks || {};
     const artworkCache = new Map(
       Object.entries(rawArtworks).filter(([, v]) => typeof v === "string" && v.startsWith("http"))
@@ -1574,7 +1515,6 @@
     const inflightArtwork = new Map();
     const normCache = new Map();
 
-    /* OffscreenCanvas 4x4 Cover Luminance Sampler */
     const coverLuminanceCache = new Map(Object.entries(stateCache.lum || {}));
     const inflightLuminance = new Set();
     const lumCanvas = typeof OffscreenCanvas !== "undefined"
@@ -1785,7 +1725,7 @@
       return MONO_MUSIC_SVGS[key] || MONO_MUSIC_SVGS.spotify;
     }
 
-    function extractLiveSpotifyFromPresence(data) {
+    function extractLiveMusic(data) {
       if (!data) return null;
       const acts = Array.isArray(data.activities) ? data.activities : [];
       const musicAct = acts.find(a => {
@@ -1805,21 +1745,7 @@
       const detectedApp = detectMusicApp(musicAct, data);
       currentListeningApp = detectedApp;
 
-      if (musicAct && detectedApp !== "spotify" && musicAct.details) {
-        const artist = String(musicAct.state || "").replace(/;\s*/g, ", ").trim();
-        const art = resolveActivityIcon(musicAct) || "";
-        return {
-          song: musicAct.details,
-          artist: artist || "Unknown Artist",
-          art,
-          url: resolveActivityUrl(musicAct) || `https://www.last.fm/user/${LASTFM_USERNAME}`,
-          timestamps: musicAct.timestamps || null,
-          trackId: musicAct.sync_id || `${musicAct.details}:${artist}`,
-          app: detectedApp
-        };
-      }
-
-      if (data.spotify && data.spotify.song) {
+      if (detectedApp === "spotify" && data.spotify?.song) {
         const sp = data.spotify;
         const artist = String(sp.artist || "").replace(/;\s*/g, ", ").trim();
         const art = sp.album_art_url || (musicAct ? resolveActivityIcon(musicAct) : "");
@@ -1837,14 +1763,13 @@
         };
       }
 
-      if (musicAct && musicAct.details) {
+      if (musicAct?.details) {
         const artist = String(musicAct.state || "").replace(/;\s*/g, ", ").trim();
-        const art = resolveActivityIcon(musicAct) || "";
         return {
           song: musicAct.details,
           artist: artist || "Unknown Artist",
-          art,
-          url: resolveActivityUrl(musicAct) || `https://open.spotify.com/search/${encodeURIComponent(musicAct.details)}`,
+          art: resolveActivityIcon(musicAct) || "",
+          url: resolveActivityUrl(musicAct) || `https://www.last.fm/user/${LASTFM_USERNAME}`,
           timestamps: musicAct.timestamps || null,
           trackId: musicAct.sync_id || `${musicAct.details}:${artist}`,
           app: detectedApp
@@ -1860,7 +1785,7 @@
       activeSpotifyTrack = null;
       activeSpotifyKey = "";
       pushToDiscordHistory(finished);
-      syncLiveAndRenderTracks(true);
+      renderTracksDOM(buildCombinedTrackList(), lastFmTotal, true);
       fetchLanyardFastREST();
       fetchLastFmGrid(true);
       setTimeout(() => fetchLastFmGrid(true), 1800);
@@ -1869,14 +1794,13 @@
 
     function scheduleSongEndRefresh(timestamps) {
       clearTimeout(songEndTimeout);
-      if (!timestamps || !timestamps.end) return;
+      if (!timestamps?.end) return;
       const remaining = timestamps.end - Date.now();
       if (remaining > 0 && remaining < 1800000) {
         songEndTimeout = setTimeout(handleSongFinishTransition, remaining + 120);
       }
     }
 
-    /* Zero-Main-Thread Compositor Progress Bar via Web Animations API */
     function stopProgressLoop() {
       if (liveProgressAnim) {
         liveProgressAnim.cancel();
@@ -1912,7 +1836,6 @@
       );
     }
 
-    /* In-Place Activity Feed Diffing with Cached Node Pointers */
     function renderActivityFeed(liveActivities = []) {
       const items = liveActivities.filter(a => a && a.type !== 4);
 
@@ -2021,7 +1944,7 @@
 
       const prevTrack = activeSpotifyTrack;
       const prevKey = activeSpotifyKey;
-      const liveSp = extractLiveSpotifyFromPresence(data);
+      const liveSp = extractLiveMusic(data);
       const nextKey = liveSp ? `${liveSp.trackId}:${liveSp.song}:${liveSp.app}` : "";
 
       if (prevTrack && prevKey && prevKey !== nextKey) {
@@ -2042,7 +1965,7 @@
       }
 
       if (prevKey !== activeSpotifyKey) {
-        syncLiveAndRenderTracks(true);
+        renderTracksDOM(buildCombinedTrackList(), lastFmTotal, true);
         fetchLastFmGrid(true);
         setTimeout(() => fetchLastFmGrid(true), 1500);
         setTimeout(() => fetchLastFmGrid(true), 3500);
@@ -2145,9 +2068,7 @@
       if (DOM.cloudDesc.textContent !== desc) DOM.cloudDesc.textContent = desc;
     }
 
-    /* ====================================================
-       CONCURRENT ABORTABLE ARTWORK RESOLVER (ITUNES + LAST.FM)
-       ==================================================== */
+    /* Concurrent Abortable Artwork Resolver (iTunes + Last.fm) */
     function fetchTrackCoverUrl(artistRaw, trackRaw) {
       const cached = getCachedTrackArt(artistRaw, trackRaw);
       if (cached) return Promise.resolve(cached);
@@ -2324,11 +2245,6 @@
       return result.slice(0, 10);
     }
 
-    function syncLiveAndRenderTracks(force = false) {
-      const combined = buildCombinedTrackList();
-      renderTracksDOM(combined, lastFmTotal, force);
-    }
-
     function refreshRelativeTimeLabels(rowEl, tracks) {
       if (!rowEl) return;
       for (let idx = 0; idx < tracks.length; idx++) {
@@ -2482,7 +2398,7 @@
       lastLfmPayloadSig = sig;
       lastFmTracks = sliced;
       if (total) lastFmTotal = total;
-      syncLiveAndRenderTracks();
+      renderTracksDOM(buildCombinedTrackList(), lastFmTotal);
       saveCache({ tracks: lastFmTracks, totalScrobbles: lastFmTotal });
     }
 
@@ -2512,15 +2428,13 @@
         if (DOM.loader && !DOM.loader.classList.contains("hidden")) {
           DOM.loader.classList.add("hidden");
           document.body.classList.add("loaded");
-          syncHandleCopyWidths();
-          setTimeout(() => DOM.loader.remove(), 800);
+          syncHandleWidth();
+          setTimeout(() => DOM.loader.remove(), 900);
         }
       }, waitMs);
     }
 
     (async function init() {
-      syncHandleCopyWidths();
-
       const hasCachedState = Boolean(stateCache.dstnUser || stateCache.presence);
       if (stateCache.dstnUser) updateUserHeader(stateCache.dstnUser, stateCache.dstnFull);
       if (stateCache.bio) renderDiscordBio(stateCache.bio);
@@ -2528,8 +2442,9 @@
       if (stateCache.presence) applyPresenceData(stateCache.presence);
       else renderActivityFeed([]);
       if (stateCache.cloud) applyCloudServer(stateCache.cloud.guild, stateCache.cloud.online, stateCache.cloud.members);
-      if (lastFmTracks.length > 0) syncLiveAndRenderTracks();
+      if (lastFmTracks.length > 0) renderTracksDOM(buildCombinedTrackList(), lastFmTotal);
 
+      syncHandleWidth();
       if (hasCachedState) revealSite();
 
       const pLanyard = EARLY.lanyard.then(res => { if (res?.data) applyPresenceData(res.data); });

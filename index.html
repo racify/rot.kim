@@ -11,32 +11,25 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://api.lanyard.rest" crossorigin />
   <link rel="preconnect" href="https://dcdn.dstn.to" crossorigin />
+  <link rel="preconnect" href="https://japi.rest" crossorigin />
   <link rel="preconnect" href="https://ws.audioscrobbler.com" crossorigin />
   <link rel="preconnect" href="https://lrclib.net" crossorigin />
   <link rel="preconnect" href="https://cdn.discordapp.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="preconnect" href="https://i.scdn.co" crossorigin />
   <link rel="preconnect" href="https://itunes.apple.com" crossorigin />
+  <link rel="preconnect" href="https://api.deezer.com" crossorigin />
   <link rel="preconnect" href="https://unavatar.io" crossorigin />
 
   <script>
-    (function setDomainTabTitle() {
+    (() => {
       try {
-        const rawHost = (window.location.hostname || window.location.host || "")
+        const host = (window.location.hostname || window.location.host || window.location.href || "")
           .replace(/^https?:\/\//i, "")
           .replace(/^www\./i, "")
-          .replace(/\/+$/, "")
+          .split(/[/?#]/)[0]
           .trim();
-        if (rawHost) {
-          document.title = rawHost;
-        } else {
-          const fallbackHost = String(window.location.href || "")
-            .replace(/^https?:\/\//i, "")
-            .replace(/^www\./i, "")
-            .split(/[/?#]/)[0]
-            .trim();
-          if (fallbackHost) document.title = fallbackHost;
-        }
+        if (host && host !== "localhost" && !host.includes(":")) document.title = host;
       } catch {}
     })();
 
@@ -45,21 +38,12 @@
     const SECOND_INVITE = "zZf4RAP6Gq";
     const LASTFM_API_KEY = "56f986f70954d1ad8c8b3ec3aec33f83";
     const LASTFM_USERNAME = "renumerate";
-    const BG_MEDIA_URL = "bg.png";
-    const BG_FALLBACK_CANDIDATES = [
-      "bg.png",
-      "bg.jpg",
-      "bg.jpeg",
-      "bg.webp",
-      "bg.gif",
-      "bg.avif",
-      "background.png",
-      "background.jpg",
-      "background.webp",
-      "background.mp4"
+    const BG_CANDIDATES = [
+      "bg.png", "bg.jpg", "bg.jpeg", "bg.webp", "bg.gif", "bg.avif",
+      "background.png", "background.jpg", "background.webp", "background.mp4"
     ];
-    const CACHE_KEY = "zack_cache_v19";
-    const BOOT_MIN_MS = 140;
+    const CACHE_KEY = "zack_cache_v20";
+    const BOOT_MIN_MS = 120;
     const BOOT_START = performance.now();
 
     const fetchJson = async (url, noStore = false, timeoutMs = 4500, extSignal = null) => {
@@ -87,9 +71,30 @@
       }
     };
 
+    const fetchDiscordProfileRace = async () => {
+      const ctrl = new AbortController();
+      const fromDstn = async () => {
+        const d = await fetchJson(`https://dcdn.dstn.to/profile/${DISCORD_ID}`, true, 4500, ctrl.signal);
+        if (d && (d.user || d.account)) return d;
+        throw new Error();
+      };
+      const fromJapi = async () => {
+        const d = await fetchJson(`https://japi.rest/discord/v1/user/${DISCORD_ID}`, true, 4500, ctrl.signal);
+        if (d?.data) return { user: d.data, badges: d.data.public_flags_array || [] };
+        throw new Error();
+      };
+      try {
+        const winner = await Promise.any([fromDstn(), fromJapi()]);
+        ctrl.abort();
+        return winner;
+      } catch {
+        return null;
+      }
+    };
+
     const EARLY = {
       lanyard: fetchJson(`https://api.lanyard.rest/v1/users/${DISCORD_ID}`, true),
-      dstn: fetchJson(`https://dcdn.dstn.to/profile/${DISCORD_ID}`, true),
+      profile: fetchDiscordProfileRace(),
       lastfm: fetchJson(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${LASTFM_USERNAME}&api_key=${LASTFM_API_KEY}&format=json&limit=10`, true),
       invite: fetchJson(`https://discord.com/api/v10/invites/${CLOUD_INVITE}?with_counts=true`),
       invite2: fetchJson(`https://discord.com/api/v10/invites/${SECOND_INVITE}?with_counts=true`)
@@ -114,7 +119,6 @@
       --accent-deep: #3f3f46;
       --accent-mid: #71717a;
       --accent: #d4d4d8;
-      --accent-rich: #e4e4e7;
       --accent-bright: #fafafa;
       --accent-shimmer: #ffffff;
       --accent-gradient: linear-gradient(90deg, #52525b 0%, #a1a1aa 26%, #d4d4d8 58%, #f4f4f5 84%, #ffffff 100%);
@@ -148,16 +152,15 @@
     ::selection {
       background: rgba(212, 212, 216, 0.28);
       color: #ffffff;
-      -webkit-text-fill-color: #ffffff;
     }
 
-    img, video, svg, canvas, .status-dot, .play-live-pip, .eq-bars {
+    img, video, svg, .status-dot, .play-live-pip, .eq-bars {
       user-select: none;
       -webkit-user-select: none;
       -webkit-user-drag: none;
     }
 
-    a, button, .clickable {
+    a, .clickable {
       cursor: pointer !important;
     }
 
@@ -289,7 +292,6 @@
       .page-wrap { gap: 18px; }
     }
 
-    /* Profile Header */
     .profile-top {
       display: flex;
       flex-direction: column;
@@ -369,7 +371,6 @@
       width: 100%;
       height: 100%;
       display: block;
-      transition: transform 0.6s var(--ease-out), opacity 0.6s var(--ease-out);
     }
 
     .identity-text {
@@ -515,7 +516,6 @@
       gap: 4px;
       height: 15px;
       transform: translateY(1px);
-      transition: transform 0.68s var(--ease-out);
     }
 
     .discord-badges:empty { display: none; }
@@ -549,7 +549,6 @@
       letter-spacing: -0.01em;
       white-space: pre-line;
       word-break: break-word;
-      transition: opacity 0.6s var(--ease-out);
     }
 
     .bio-line:empty { display: none; }
@@ -562,7 +561,6 @@
       display: inline-block;
     }
 
-    /* Section Blocks */
     .sec-block {
       display: flex;
       flex-direction: column;
@@ -594,7 +592,6 @@
       transform: translateX(2.5px);
     }
 
-    /* Projects Container */
     .projects-list {
       display: flex;
       flex-direction: column;
@@ -623,7 +620,7 @@
       border: 1px solid var(--border);
       box-shadow: var(--glass-highlight), 0 4px 12px rgba(0, 0, 0, 0.42);
       flex-shrink: 0;
-      transition: border-color 0.72s var(--ease-out), box-shadow 0.72s var(--ease-out), transform 0.72s var(--ease-out);
+      transition: border-color 0.72s var(--ease-out), box-shadow 0.72s var(--ease-out);
     }
 
     .project-row:hover .project-icon {
@@ -659,10 +656,8 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      transition: color 0.62s var(--ease-out);
     }
 
-    /* Activity List */
     .activity-list {
       display: flex;
       flex-direction: column;
@@ -705,7 +700,7 @@
       display: grid;
       place-items: center;
       color: var(--text-muted);
-      transition: border-color 0.68s var(--ease-out), box-shadow 0.68s var(--ease-out), transform 0.68s var(--ease-out);
+      transition: border-color 0.68s var(--ease-out), box-shadow 0.68s var(--ease-out);
     }
 
     .activity-row:hover .activity-icon {
@@ -728,7 +723,6 @@
       letter-spacing: -0.015em;
       color: var(--text-strong);
       flex-shrink: 0;
-      transition: color 0.6s var(--ease-out);
     }
 
     .activity-detail {
@@ -774,9 +768,6 @@
       transform: translate(2.5px, -2.5px);
     }
 
-    /* ====================================================
-       EXPANDABLE CARDS (FAVORITE CONTENT & RECENT PLAYS)
-       ==================================================== */
     .plays-stack {
       position: relative;
       display: flex;
@@ -795,9 +786,7 @@
       z-index: 25;
       opacity: 0;
       transform: translateY(-50%) translateX(10px);
-      transition:
-        opacity 0.74s var(--ease-out),
-        transform 0.74s var(--ease-out);
+      transition: opacity 0.74s var(--ease-out), transform 0.74s var(--ease-out);
       -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 20%, #000 80%, transparent 100%);
       mask-image: linear-gradient(to bottom, transparent 0%, #000 20%, #000 80%, transparent 100%);
     }
@@ -911,8 +900,7 @@
         flex-grow 0.82s var(--ease-out),
         border-color 0.68s var(--ease-out),
         box-shadow 0.68s var(--ease-out),
-        opacity 0.68s var(--ease-out),
-        transform 0.68s var(--ease-out);
+        opacity 0.68s var(--ease-out);
     }
 
     .play-card::after {
@@ -923,7 +911,6 @@
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(212, 212, 216, 0.04) 45%, rgba(0, 0, 0, 0.28) 100%);
       pointer-events: none;
       z-index: 2;
-      transition: opacity 0.68s var(--ease-out);
     }
 
     .play-card.now-playing {
@@ -1032,7 +1019,7 @@
       background: var(--surface);
       border: 1px solid rgba(228, 228, 231, 0.24);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.56);
-      transition: transform 0.72s var(--ease-out), border-color 0.62s var(--ease-out), box-shadow 0.62s var(--ease-out);
+      transition: transform 0.72s var(--ease-out);
     }
 
     .play-card:hover .play-thumb {
@@ -1063,7 +1050,6 @@
       color: rgba(244, 244, 245, 0.85);
       text-transform: uppercase;
       letter-spacing: 0.03em;
-      transition: color 0.58s var(--ease-out);
     }
 
     .play-card.light-bg .play-meta-top {
@@ -1085,7 +1071,6 @@
       flex-shrink: 0;
       color: #ffffff;
       fill: currentColor;
-      transition: color 0.58s var(--ease-out);
     }
 
     .play-card.light-bg .play-app-icon {
@@ -1129,7 +1114,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       line-height: 1.22;
-      transition: color 0.58s var(--ease-out);
     }
 
     .play-card.light-bg .play-title {
@@ -1144,7 +1128,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       line-height: 1.2;
-      transition: color 0.58s var(--ease-out);
     }
 
     .play-card.light-bg .play-artist {
@@ -1178,7 +1161,6 @@
       .play-expanded { padding: 6px 8px; gap: 8px; }
     }
 
-    /* Footer */
     .page-footer {
       display: flex;
       align-items: center;
@@ -1280,7 +1262,7 @@
       </div>
 
       <div class="projects-list">
-        <a id="cloud-project-row" href="https://discord.gg/rKZGYvmUUC" target="_blank" rel="noopener noreferrer" class="project-row">
+        <a href="https://discord.gg/rKZGYvmUUC" target="_blank" rel="noopener noreferrer" class="project-row">
           <img id="cloud-proj-icon" class="project-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" decoding="async" />
           <div class="project-info">
             <span class="project-title" id="cloud-proj-name">moon men</span>
@@ -1288,7 +1270,7 @@
           </div>
         </a>
 
-        <a id="second-project-row" href="https://discord.gg/zZf4RAP6Gq" target="_blank" rel="noopener noreferrer" class="project-row">
+        <a href="https://discord.gg/zZf4RAP6Gq" target="_blank" rel="noopener noreferrer" class="project-row">
           <img id="second-proj-icon" class="project-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" decoding="async" />
           <div class="project-info">
             <span class="project-title" id="second-proj-name">discord server</span>
@@ -1441,7 +1423,7 @@
     const CDN = "https://cdn.discordapp.com";
 
     const DEFAULT_VINYL_SVG =
-      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='50%25' stop-color='%23d4d4d8'/%3E%3Cstop offset='100%25' stop-color='%2352525b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='300' height='300' fill='%23070709'/%3E%3Ccircle cx='150' cy='150' r='58' fill='none' stroke='%2327272a' stroke-width='6'/%3E%3Ccircle cx='150' cy='150' r='16' fill='url(%23g)'/%3E%3C/svg%3E";
+      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='50%25' stop-color='%23d4d4d8'/%3E%3Cstop offset='100%25' stop-color='%2352525b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='300' height='300' fill='%23070709'/%3E%3Ccircle cx='150' cy='150' r='58' fill='none' stroke='%2327272a' stroke-width='6'/%3E%3Ccircle cx='150' cy='150' r='16' fill='url(%23g)'/%3E%3C/svg%3E";
 
     const MONO_MUSIC_SVGS = {
       spotify: `<svg class="play-app-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>`,
@@ -1514,10 +1496,23 @@
       { match: ["kitty"], url: "https://sw.kovidgoyal.net/kitty/" }
     ];
 
+    const FAVICON_DOMAINS = [
+      [["zed"], "zed.dev"],
+      [["helium"], "helium.computer"],
+      [["mullvad"], "mullvad.net"],
+      [["code"], "code.visualstudio.com"],
+      [["roblox", "sober"], "roblox.com"],
+      [["modrinth"], "modrinth.com"],
+      [["lunar", "minecraft"], "lunarclient.com"],
+      [["assetto"], "assettocorsa.gg"],
+      [["soundcloud"], "soundcloud.com"],
+      [["youtube music", "yt music"], "music.youtube.com"],
+      [["spotify"], "spotify.com"]
+    ];
+
     const ARROW_SVG = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>`;
     const CLOCK_SVG = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
     const PAD_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4m-2-2v4m7-1h.01M18 11h.01"/></svg>`;
-
     const LINE_LINK_REGEX = /(?:https?:\/\/|www\.|discord\.gg\/|discord\.com\/invite\/|\b[a-z0-9-]+\.(?:gg|com|net|org|io|me|co|tv|xyz|dev|app|lol|sh|to|fm|ly|link|bio|cc|kim)\b)/i;
 
     const scheduleIdle = window.requestIdleCallback || (cb => setTimeout(cb, 16));
@@ -1548,41 +1543,9 @@
       lastfmGrid: document.getElementById("lastfm-grid"),
       lastfmStats: document.getElementById("lastfm-stats-label"),
       lyricsFloat: document.getElementById("lyrics-float"),
-      lyricsTrack: document.getElementById("lyrics-track"),
-      mcStage: document.getElementById("mc-side-stage"),
-      rbxStage: document.getElementById("rbx-side-stage"),
-      mcCanvasWrap: document.getElementById("mc-canvas-wrap"),
-      rbxCanvasWrap: document.getElementById("rbx-canvas-wrap"),
-      mcCanvas: document.getElementById("mc-3d-canvas"),
-      rbxCanvas: document.getElementById("rbx-3d-canvas"),
-      mcTagLabel: document.getElementById("mc-tag-label"),
-      rbxTagLabel: document.getElementById("rbx-tag-label")
+      lyricsTrack: document.getElementById("lyrics-track")
     };
 
-    /* Responsive placement for <900px viewports */
-    (function setupResponsive3DStages() {
-      let mobileRow = null;
-      function checkViewport() {
-        if (window.innerWidth <= 900) {
-          if (!mobileRow) {
-            mobileRow = document.createElement("div");
-            mobileRow.className = "mobile-3d-row";
-            document.body.insertBefore(mobileRow, document.querySelector(".page-wrap"));
-          }
-          if (DOM.mcStage.parentElement !== mobileRow) mobileRow.appendChild(DOM.mcStage);
-          if (DOM.rbxStage.parentElement !== mobileRow) mobileRow.appendChild(DOM.rbxStage);
-        } else if (mobileRow) {
-          document.body.insertBefore(DOM.mcStage, document.querySelector(".page-wrap"));
-          document.body.insertBefore(DOM.rbxStage, document.querySelector(".page-wrap"));
-          mobileRow.remove();
-          mobileRow = null;
-        }
-      }
-      checkViewport();
-      window.addEventListener("resize", checkViewport, { passive: true });
-    })();
-
-    /* Smooth-Cornered Square Favicon Generator */
     function updateTabFavicon(avatarUrl) {
       if (!avatarUrl) return;
       const img = new Image();
@@ -1612,7 +1575,6 @@
           ctx.closePath();
           ctx.clip();
           ctx.drawImage(img, 0, 0, size, size);
-          const dataUrl = canvas.toDataURL("image/png");
           let link = document.getElementById("dynamic-favicon");
           if (!link) {
             link = document.createElement("link");
@@ -1621,28 +1583,23 @@
             document.head.appendChild(link);
           }
           link.type = "image/png";
-          link.href = dataUrl;
+          link.href = canvas.toDataURL("image/png");
         } catch {}
       };
       img.src = avatarUrl;
     }
 
     function swapImageSmooth(imgEl, targetUrl, fallbackUrl = null) {
-      if (!imgEl || !targetUrl) return;
-      if (imgEl.getAttribute("src") === targetUrl) return;
+      if (!imgEl || !targetUrl || imgEl.getAttribute("src") === targetUrl) return;
       if (targetUrl.startsWith("data:")) {
         imgEl.src = targetUrl;
         return;
       }
       const probe = new Image();
       probe.decoding = "async";
-      probe.onload = () => {
-        imgEl.src = targetUrl;
-      };
+      probe.onload = () => { imgEl.src = targetUrl; };
       probe.onerror = () => {
-        if (fallbackUrl && imgEl.getAttribute("src") !== fallbackUrl) {
-          imgEl.src = fallbackUrl;
-        }
+        if (fallbackUrl && imgEl.getAttribute("src") !== fallbackUrl) imgEl.src = fallbackUrl;
       };
       probe.src = targetUrl;
     }
@@ -1655,45 +1612,37 @@
       if (copiedW > 0) DOM.statusText.style.setProperty("--w-copied", `${Math.max(normalW, copiedW)}px`);
     }
 
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(syncHandleCopyWidths).catch(() => {});
-    }
+    document.fonts?.ready.then(syncHandleCopyWidths).catch(() => {});
     window.addEventListener("resize", syncHandleCopyWidths, { passive: true });
 
-    (function initBackgroundMedia() {
+    (() => {
       const wrap = document.getElementById("bg-media-wrap");
       const imgEl = document.getElementById("bg-image");
       const videoEl = document.getElementById("bg-video");
       if (!wrap || !imgEl || !videoEl) return;
 
-      const candidates = Array.from(
-        new Set([BG_MEDIA_URL, ...BG_FALLBACK_CANDIDATES].filter(Boolean))
-      );
-
       const isVideoUrl = url => /\.(mp4|webm|ogg|mov)(?:[?#]|$)/i.test(url);
       let idx = 0;
 
       function tryNext() {
-        if (idx >= candidates.length) {
+        if (idx >= BG_CANDIDATES.length) {
           wrap.remove();
           return;
         }
-
-        const candidate = candidates[idx++];
-
+        const candidate = BG_CANDIDATES[idx++];
         if (isVideoUrl(candidate)) {
           imgEl.classList.remove("active");
           videoEl.src = candidate;
-          const onVideoReady = () => {
+          const onReady = () => {
             videoEl.classList.add("active");
             wrap.classList.add("ready");
             videoEl.play().catch(() => {});
           };
-          videoEl.addEventListener("loadeddata", onVideoReady, { once: true });
-          videoEl.addEventListener("canplay", onVideoReady, { once: true });
+          videoEl.addEventListener("loadeddata", onReady, { once: true });
+          videoEl.addEventListener("canplay", onReady, { once: true });
           videoEl.addEventListener("error", () => {
-            videoEl.removeEventListener("loadeddata", onVideoReady);
-            videoEl.removeEventListener("canplay", onVideoReady);
+            videoEl.removeEventListener("loadeddata", onReady);
+            videoEl.removeEventListener("canplay", onReady);
             tryNext();
           }, { once: true });
         } else {
@@ -1705,9 +1654,7 @@
             imgEl.classList.add("active");
             wrap.classList.add("ready");
           };
-          probe.onerror = () => {
-            tryNext();
-          };
+          probe.onerror = tryNext;
           probe.src = candidate;
         }
       }
@@ -1716,11 +1663,8 @@
 
       document.addEventListener("visibilitychange", () => {
         if (!videoEl.classList.contains("active")) return;
-        if (!document.hidden && wrap.classList.contains("ready")) {
-          videoEl.play().catch(() => {});
-        } else if (document.hidden) {
-          videoEl.pause();
-        }
+        if (!document.hidden && wrap.classList.contains("ready")) videoEl.play().catch(() => {});
+        else if (document.hidden) videoEl.pause();
       });
     })();
 
@@ -1738,17 +1682,13 @@
       clearTimeout(saveCacheTimer);
       saveCacheTimer = setTimeout(() => {
         scheduleIdle(() => {
-          try {
-            localStorage.setItem(CACHE_KEY, JSON.stringify(stateCache));
-          } catch {}
+          try { localStorage.setItem(CACHE_KEY, JSON.stringify(stateCache)); } catch {}
         });
       }, 450);
     }
 
     const ESC_MAP = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
-    function escapeHTML(str) {
-      return String(str || "").replace(/[&<>"']/g, m => ESC_MAP[m]);
-    }
+    const escapeHTML = str => String(str || "").replace(/[&<>"']/g, m => ESC_MAP[m]);
 
     let currentDiscordUsername = stateCache.dstnUser?.username || stateCache.presence?.discord_user?.username || "byeu_u";
     let lastBadgesSig = "";
@@ -1756,14 +1696,10 @@
     let lastActivitySig = "";
     let lastDstnSig = "";
     let copyTimer = null;
-
-    const badgeState = {
-      api: [],
-      flags: []
-    };
+    const badgeState = { api: [], flags: [] };
 
     function copyTextToClipboard(text) {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
+      if (navigator.clipboard?.writeText) {
         return navigator.clipboard.writeText(text).catch(() => fallbackCopyText(text));
       }
       return fallbackCopyText(text);
@@ -1774,9 +1710,7 @@
         try {
           const ta = document.createElement("textarea");
           ta.value = text;
-          ta.style.position = "fixed";
-          ta.style.opacity = "0";
-          ta.style.pointerEvents = "none";
+          ta.style.cssText = "position:fixed;opacity:0;pointer-events:none";
           document.body.appendChild(ta);
           ta.select();
           document.execCommand("copy");
@@ -1791,9 +1725,7 @@
       copyTextToClipboard(currentDiscordUsername).then(() => {
         clearTimeout(copyTimer);
         this.classList.add("copied");
-        copyTimer = setTimeout(() => {
-          this.classList.remove("copied");
-        }, 1350);
+        copyTimer = setTimeout(() => this.classList.remove("copied"), 1350);
       });
     });
 
@@ -1802,9 +1734,7 @@
       const rawIcon = String(b.icon || b.asset || "").replace(/\.png$/i, "");
       let dcdnUrl = b.icon_url || b.iconUrl || "";
       if (!dcdnUrl && rawIcon) {
-        dcdnUrl = /^https?:\/\//i.test(rawIcon)
-          ? rawIcon
-          : `${CDN}/badge-icons/${rawIcon}.png?size=${size}`;
+        dcdnUrl = /^https?:\/\//i.test(rawIcon) ? rawIcon : `${CDN}/badge-icons/${rawIcon}.png?size=${size}`;
       }
       const svgFallback = DISCORD_SVG_BADGE_MAP[id] ? `${BADGE_CDN_BASE}/${DISCORD_SVG_BADGE_MAP[id]}` : null;
       return {
@@ -1815,7 +1745,7 @@
     }
 
     function decodeFlagBadges(user) {
-      const flags = Number((user && (user.public_flags ?? user.flags)) || 0);
+      const flags = Number(user?.public_flags ?? user?.flags ?? 0);
       if (!flags) return [];
       const list = [];
       for (const [bit, b] of PUBLIC_FLAG_BADGES) {
@@ -1830,8 +1760,7 @@
       const seen = new Set();
       const deduped = [];
 
-      for (let i = 0; i < combined.length; i++) {
-        const b = combined[i];
+      for (const b of combined) {
         if (!b || b.hidden === true || b.visible === false) continue;
         const { primaryUrl, fallbackUrl, cleanHash } = resolveBadgeAssets(b, 256);
         if (!primaryUrl) continue;
@@ -1854,8 +1783,7 @@
       lastBadgesSig = sig;
 
       const frag = document.createDocumentFragment();
-      for (let i = 0; i < deduped.length; i++) {
-        const b = deduped[i];
+      for (const b of deduped) {
         const span = document.createElement("span");
         span.className = "discord-badge-item";
         span.title = b.label;
@@ -1891,7 +1819,7 @@
     }
 
     function updateClanTag(clanObj) {
-      if (clanObj && clanObj.tag && clanObj.identity_enabled !== false) {
+      if (clanObj?.tag && clanObj.identity_enabled !== false) {
         if (DOM.clanTagText.textContent !== clanObj.tag) DOM.clanTagText.textContent = clanObj.tag;
         if (clanObj.identity_guild_id && clanObj.badge) {
           const badgeUrl = `${CDN}/clan-badges/${clanObj.identity_guild_id}/${clanObj.badge}.png?size=32`;
@@ -1941,25 +1869,19 @@
       }
 
       const rawName = (user.global_name || user.display_name || user.username || "zack").trim();
-      if (DOM.username.textContent !== rawName) {
-        DOM.username.textContent = rawName;
-      }
+      if (DOM.username.textContent !== rawName) DOM.username.textContent = rawName;
 
       const nameStyle = fullProfileData?.user_profile?.display_name_style || user.display_name_style;
-      if (nameStyle && nameStyle.colors && nameStyle.colors.length >= 2) {
+      if (nameStyle?.colors?.length >= 2) {
         DOM.username.style.setProperty("--color-1", nameStyle.colors[0]);
         DOM.username.style.setProperty("--color-2", nameStyle.colors[1]);
-        DOM.username.style.setProperty("--name-angle", (nameStyle.angle || 90) + "deg");
+        DOM.username.style.setProperty("--name-angle", `${nameStyle.angle || 90}deg`);
         DOM.username.classList.add("has-gradient");
-        if (nameStyle.animated || nameStyle.effect === "animated") {
-          DOM.username.classList.add("animated");
-        }
+        if (nameStyle.animated || nameStyle.effect === "animated") DOM.username.classList.add("animated");
       }
 
       const uid = user.id || DISCORD_ID;
-      if (DOM.footerUsernameLink) {
-        DOM.footerUsernameLink.href = `https://discord.com/users/${uid}`;
-      }
+      if (DOM.footerUsernameLink) DOM.footerUsernameLink.href = `https://discord.com/users/${uid}`;
 
       if (user.username) {
         currentDiscordUsername = user.username;
@@ -1967,8 +1889,7 @@
           DOM.handleName.textContent = user.username;
           syncHandleCopyWidths();
         }
-        const displayName = user.global_name || user.display_name || user.username || "byeu_u";
-        const footerTag = `@${displayName}`;
+        const footerTag = `@${rawName}`;
         if (DOM.footerUsernameLink && DOM.footerUsernameLink.textContent !== footerTag) {
           DOM.footerUsernameLink.textContent = footerTag;
         }
@@ -2041,7 +1962,7 @@
       if (document.hidden || isFetchingDstn) return;
       isFetchingDstn = true;
       try {
-        const data = await fetchJson(`https://dcdn.dstn.to/profile/${DISCORD_ID}`, true);
+        const data = await fetchDiscordProfileRace();
         if (data) applyDstnPayload(data);
       } finally {
         isFetchingDstn = false;
@@ -2049,452 +1970,10 @@
     }
 
     /* ====================================================
-       3D MINECRAFT (LEFT) & ROBLOX (RIGHT) ENGINES
-       ==================================================== */
-    function initMinecraft3DViewer() {
-      if (!DOM.mcCanvas || !DOM.mcCanvasWrap) return;
-      if (typeof window.skinview3d === "undefined") {
-        setTimeout(initMinecraft3DViewer, 80);
-        return;
-      }
-
-      const rect = DOM.mcCanvasWrap.getBoundingClientRect();
-      const w = Math.max(200, Math.round(rect.width || 280));
-      const h = Math.max(320, Math.round(rect.height || 440));
-
-      const viewer = new skinview3d.SkinViewer({
-        canvas: DOM.mcCanvas,
-        width: w,
-        height: h,
-        skin: `https://mc-heads.net/skin/${MINECRAFT_UUID}`
-      });
-
-      viewer.fov = 38;
-      viewer.zoom = 0.86;
-      viewer.autoRotate = true;
-      viewer.autoRotateSpeed = 1.15; // Spins Clockwise
-      viewer.animation = new skinview3d.IdleAnimation();
-
-      if (viewer.controls) {
-        viewer.controls.enableZoom = false;
-        viewer.controls.enablePan = false;
-      }
-
-      // Resolve exact Mojang profile username, slim/classic model & fallback skins
-      fetchJson(`https://api.ashcon.app/mojang/v2/user/${MINECRAFT_UUID}`, false, 4500).then(profile => {
-        if (profile) {
-          if (profile.username && DOM.mcTagLabel) {
-            DOM.mcTagLabel.textContent = profile.username;
-          }
-          const rawSkinUrl = profile.textures?.skin?.url;
-          const isSlim = profile.textures?.slim === true;
-          if (rawSkinUrl) {
-            viewer.loadSkin(rawSkinUrl, { model: isSlim ? "slim" : "default" }).catch(() => {});
-          }
-          const rawCapeUrl = profile.textures?.cape?.url;
-          if (rawCapeUrl) {
-            viewer.loadCape(rawCapeUrl).catch(() => {});
-          }
-        }
-      });
-
-      let resizeTimer = null;
-      window.addEventListener("resize", () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-          const r = DOM.mcCanvasWrap.getBoundingClientRect();
-          if (r.width > 0 && r.height > 0) {
-            viewer.setSize(Math.round(r.width), Math.round(r.height));
-          }
-        }, 100);
-      }, { passive: true });
-    }
-
-    function getRbxCdnUrl(hash) {
-      const clean = String(hash || "").trim();
-      let i = 31;
-      for (let t = 0; t < clean.length; t++) {
-        i ^= clean.charCodeAt(t);
-      }
-      return `https://t${i % 8}.rbxcdn.com/${clean}`;
-    }
-
-    async function fetchWithCorsFallback(targetUrl, asText = false) {
-      const candidates = [
-        targetUrl.replace("https://thumbnails.roblox.com/", "https://thumbnails.roproxy.com/")
-                 .replace("https://users.roblox.com/", "https://users.roproxy.com/"),
-        `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`
-      ];
-
-      for (let i = 0; i < candidates.length; i++) {
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 4500);
-        try {
-          const res = await fetch(candidates[i], { signal: ctrl.signal });
-          clearTimeout(timer);
-          if (res.ok) {
-            return asText ? await res.text() : await res.json();
-          }
-        } catch {
-          clearTimeout(timer);
-        }
-      }
-      return null;
-    }
-
-    function parseRobloxMtlAndObj(mtlText, objText, THREE) {
-      const materials = {};
-      let currentMtl = null;
-      const texLoader = new THREE.TextureLoader();
-      texLoader.setCrossOrigin("anonymous");
-
-      const mtlLines = String(mtlText || "").split(/\r?\n/);
-      for (let i = 0; i < mtlLines.length; i++) {
-        const line = mtlLines[i].trim();
-        if (!line || line.startsWith("#")) continue;
-        const parts = line.split(/\s+/);
-        const cmd = parts[0];
-        if (cmd === "newmtl") {
-          currentMtl = parts[1];
-          materials[currentMtl] = { color: new THREE.Color(0xd4d4d8), mapUrl: null };
-        } else if (cmd === "Kd" && currentMtl && parts.length >= 4) {
-          materials[currentMtl].color.setRGB(
-            parseFloat(parts[1]) || 0.8,
-            parseFloat(parts[2]) || 0.8,
-            parseFloat(parts[3]) || 0.8
-          );
-        } else if (cmd === "map_Kd" && currentMtl && parts[1]) {
-          const texRef = parts[parts.length - 1];
-          materials[currentMtl].mapUrl = /^https?:\/\//i.test(texRef) ? texRef : getRbxCdnUrl(texRef);
-        }
-      }
-
-      const v = [];
-      const vt = [];
-      const vn = [];
-      const groups = {};
-      let activeMtl = "default";
-
-      const objLines = String(objText || "").split(/\r?\n/);
-      for (let i = 0; i < objLines.length; i++) {
-        const line = objLines[i].trim();
-        if (!line || line.startsWith("#")) continue;
-        const parts = line.split(/\s+/);
-        const cmd = parts[0];
-
-        if (cmd === "v") {
-          v.push([parseFloat(parts[1]) || 0, parseFloat(parts[2]) || 0, parseFloat(parts[3]) || 0]);
-        } else if (cmd === "vt") {
-          vt.push([parseFloat(parts[1]) || 0, parseFloat(parts[2]) || 0]);
-        } else if (cmd === "vn") {
-          vn.push([parseFloat(parts[1]) || 0, parseFloat(parts[2]) || 0, parseFloat(parts[3]) || 0]);
-        } else if (cmd === "usemtl") {
-          activeMtl = parts[1] || "default";
-        } else if (cmd === "f") {
-          if (!groups[activeMtl]) {
-            groups[activeMtl] = { pos: [], uv: [], norm: [] };
-          }
-          const grp = groups[activeMtl];
-          const verts = parts.slice(1).map(tok => tok.split("/").map(n => parseInt(n, 10)));
-          for (let j = 1; j < verts.length - 1; j++) {
-            const tri = [verts[0], verts[j], verts[j + 1]];
-            for (let k = 0; k < 3; k++) {
-              const [vi, ti, ni] = tri[k];
-              const p = v[(vi > 0 ? vi - 1 : v.length + vi)] || [0, 0, 0];
-              const t = vt[(ti > 0 ? ti - 1 : vt.length + ti)] || [0, 0];
-              const n = vn[(ni > 0 ? ni - 1 : vn.length + ni)] || [0, 1, 0];
-              grp.pos.push(p[0], p[1], p[2]);
-              grp.uv.push(t[0], t[1]);
-              grp.norm.push(n[0], n[1], n[2]);
-            }
-          }
-        }
-      }
-
-      const root = new THREE.Group();
-      for (const [mtlName, grp] of Object.entries(groups)) {
-        if (grp.pos.length === 0) continue;
-        const geo = new THREE.BufferGeometry();
-        geo.setAttribute("position", new THREE.Float32BufferAttribute(grp.pos, 3));
-        if (grp.uv.length > 0) geo.setAttribute("uv", new THREE.Float32BufferAttribute(grp.uv, 2));
-        if (grp.norm.length > 0) {
-          geo.setAttribute("normal", new THREE.Float32BufferAttribute(grp.norm, 3));
-        } else {
-          geo.computeVertexNormals();
-        }
-
-        const mInfo = materials[mtlName] || { color: new THREE.Color(0xd4d4d8), mapUrl: null };
-        const mat = new THREE.MeshStandardMaterial({
-          color: mInfo.mapUrl ? 0xffffff : mInfo.color,
-          roughness: 0.58,
-          metalness: 0.08,
-          side: THREE.DoubleSide
-        });
-
-        if (mInfo.mapUrl) {
-          texLoader.load(mInfo.mapUrl, tex => {
-            mat.map = tex;
-            mat.needsUpdate = true;
-          });
-        }
-
-        root.add(new THREE.Mesh(geo, mat));
-      }
-
-      const box = new THREE.Box3().setFromObject(root);
-      const size = new THREE.Vector3();
-      const center = new THREE.Vector3();
-      box.getSize(size);
-      box.getCenter(center);
-
-      const maxDim = Math.max(size.x, size.y, size.z, 0.001);
-      const scale = 3.6 / maxDim;
-      root.scale.setScalar(scale);
-      root.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
-
-      const wrapper = new THREE.Group();
-      wrapper.add(root);
-      return wrapper;
-    }
-
-    function createRobloxR6FallbackRig(THREE) {
-      const rig = new THREE.Group();
-      const matHead = new THREE.MeshStandardMaterial({ color: 0xf4f4f5, roughness: 0.45, metalness: 0.1 });
-      const matTorso = new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.55, metalness: 0.15 });
-      const matLimb = new THREE.MeshStandardMaterial({ color: 0xd4d4d8, roughness: 0.5, metalness: 0.1 });
-      const matLegs = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.6, metalness: 0.1 });
-
-      const head = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.46, 0.88, 24), matHead);
-      head.position.y = 1.28;
-      rig.add(head);
-
-      const torso = new THREE.Mesh(new THREE.BoxGeometry(1.52, 1.52, 0.76), matTorso);
-      torso.position.y = 0.05;
-      rig.add(torso);
-
-      const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.72, 1.52, 0.74), matLimb);
-      leftArm.position.set(-1.16, 0.05, 0);
-      rig.add(leftArm);
-
-      const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.72, 1.52, 0.74), matLimb);
-      rightArm.position.set(1.16, 0.05, 0);
-      rig.add(rightArm);
-
-      const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.73, 1.52, 0.74), matLegs);
-      leftLeg.position.set(-0.39, -1.48, 0);
-      rig.add(leftLeg);
-
-      const rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.73, 1.52, 0.74), matLegs);
-      rightLeg.position.set(0.39, -1.48, 0);
-      rig.add(rightLeg);
-
-      rig.userData.isRig = true;
-      rig.userData.parts = { leftArm, rightArm, leftLeg, rightLeg, head };
-      return rig;
-    }
-
-    function createVolumetricAvatarMesh(texture, THREE) {
-      const group = new THREE.Group();
-      const slices = 18;
-      const depth = 0.22;
-      const planeGeo = new THREE.PlaneGeometry(3.4, 3.4);
-
-      for (let i = 0; i < slices; i++) {
-        const z = ((i / (slices - 1)) - 0.5) * depth;
-        const isEdge = i === 0 || i === slices - 1;
-        const mat = new THREE.MeshStandardMaterial({
-          map: texture,
-          transparent: true,
-          alphaTest: 0.08,
-          roughness: 0.45,
-          metalness: 0.06,
-          color: isEdge ? 0xffffff : 0xd4d4d8,
-          side: THREE.DoubleSide
-        });
-        const slice = new THREE.Mesh(planeGeo, mat);
-        slice.position.z = z;
-        group.add(slice);
-      }
-      return group;
-    }
-
-    function initRoblox3DViewer() {
-      if (!DOM.rbxCanvas || !DOM.rbxCanvasWrap) return;
-      if (typeof window.THREE === "undefined") {
-        setTimeout(initRoblox3DViewer, 80);
-        return;
-      }
-
-      const THREE = window.THREE;
-      const rect = DOM.rbxCanvasWrap.getBoundingClientRect();
-      const w = Math.max(200, Math.round(rect.width || 280));
-      const h = Math.max(320, Math.round(rect.height || 440));
-
-      const renderer = new THREE.WebGLRenderer({
-        canvas: DOM.rbxCanvas,
-        alpha: true,
-        antialias: true,
-        powerPreference: "high-performance"
-      });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      renderer.setSize(w, h, false);
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(38, w / h, 0.1, 100);
-      camera.position.set(0, 0.15, 6.2);
-
-      scene.add(new THREE.AmbientLight(0xffffff, 0.78));
-      const keyLight = new THREE.DirectionalLight(0xffffff, 0.88);
-      keyLight.position.set(3, 5, 6);
-      scene.add(keyLight);
-      const rimLight = new THREE.DirectionalLight(0xd4d4d8, 0.45);
-      rimLight.position.set(-4, 2, -5);
-      scene.add(rimLight);
-
-      const pivot = new THREE.Group();
-      scene.add(pivot);
-
-      // Start immediately with the articulated 3D R6 rig so the stage is never empty
-      const fallbackRig = createRobloxR6FallbackRig(THREE);
-      pivot.add(fallbackRig);
-
-      function replacePivotModel(newObj) {
-        while (pivot.children.length > 0) {
-          pivot.remove(pivot.children[0]);
-        }
-        pivot.add(newObj);
-      }
-
-      // Interactive horizontal drag rotation
-      let isDragging = false;
-      let prevX = 0;
-      DOM.rbxCanvasWrap.addEventListener("pointerdown", e => {
-        isDragging = true;
-        prevX = e.clientX;
-      });
-      window.addEventListener("pointermove", e => {
-        if (!isDragging) return;
-        const dx = e.clientX - prevX;
-        prevX = e.clientX;
-        pivot.rotation.y += dx * 0.012;
-      }, { passive: true });
-      window.addEventListener("pointerup", () => { isDragging = false; }, { passive: true });
-
-      // Fetch Roblox username for label
-      fetchWithCorsFallback(`https://users.roblox.com/v1/users/${ROBLOX_USER_ID}`, false).then(u => {
-        const label = u?.displayName || u?.name;
-        if (label && DOM.rbxTagLabel) {
-          DOM.rbxTagLabel.textContent = label;
-        }
-      });
-
-      // Attempt 1: Load true 3D OBJ + MTL from Roblox avatar-3d API
-      // Attempt 2: Load live 720x720 full-body avatar texture as volumetric 3D model
-      (async function loadRobloxAvatarAssets() {
-        let loadedTrue3D = false;
-        const meta3d = await fetchWithCorsFallback(
-          `https://thumbnails.roblox.com/v1/users/avatar-3d?userId=${ROBLOX_USER_ID}`,
-          false
-        );
-
-        if (meta3d && meta3d.state === "Completed" && meta3d.imageUrl) {
-          try {
-            const manifest = await fetchJson(meta3d.imageUrl, false, 4500);
-            if (manifest && manifest.obj && manifest.mtl) {
-              const objUrl = /^https?:\/\//i.test(manifest.obj) ? manifest.obj : getRbxCdnUrl(manifest.obj);
-              const mtlUrl = /^https?:\/\//i.test(manifest.mtl) ? manifest.mtl : getRbxCdnUrl(manifest.mtl);
-              const [mtlText, objText] = await Promise.all([
-                fetch(mtlUrl).then(r => (r.ok ? r.text() : "")),
-                fetch(objUrl).then(r => (r.ok ? r.text() : ""))
-              ]);
-              if (objText && objText.includes("v ")) {
-                const mesh3d = parseRobloxMtlAndObj(mtlText, objText, THREE);
-                replacePivotModel(mesh3d);
-                loadedTrue3D = true;
-              }
-            }
-          } catch {}
-        }
-
-        if (!loadedTrue3D) {
-          const thumbData = await fetchWithCorsFallback(
-            `https://thumbnails.roblox.com/v1/users/avatar?userIds=${ROBLOX_USER_ID}&size=720x720&format=Png&isCircular=false`,
-            false
-          );
-          const imgUrl = thumbData?.data?.[0]?.imageUrl;
-          if (imgUrl) {
-            const texLoader = new THREE.TextureLoader();
-            texLoader.setCrossOrigin("anonymous");
-            const tryUrls = [
-              imgUrl,
-              `https://corsproxy.io/?${encodeURIComponent(imgUrl)}`,
-              `https://api.allorigins.win/raw?url=${encodeURIComponent(imgUrl)}`
-            ];
-            let idx = 0;
-            const loadNextTex = () => {
-              if (idx >= tryUrls.length) return;
-              texLoader.load(
-                tryUrls[idx++],
-                tex => {
-                  replacePivotModel(createVolumetricAvatarMesh(tex, THREE));
-                },
-                undefined,
-                loadNextTex
-              );
-            };
-            loadNextTex();
-          }
-        }
-      })();
-
-      let lastTime = performance.now();
-      function animateRoblox(now) {
-        requestAnimationFrame(animateRoblox);
-        if (document.hidden) return;
-        const dt = Math.min(0.05, (now - lastTime) / 1000);
-        lastTime = now;
-
-        if (!isDragging) {
-          // Spins Counter-Clockwise (opposite of Minecraft's clockwise spin)
-          pivot.rotation.y -= dt * 1.15;
-        }
-        pivot.position.y = Math.sin(now * 0.002) * 0.08;
-
-        const child = pivot.children[0];
-        if (child?.userData?.isRig) {
-          const { leftArm, rightArm, leftLeg, rightLeg } = child.userData.parts;
-          const swing = Math.sin(now * 0.0024) * 0.14;
-          leftArm.rotation.x = swing;
-          rightArm.rotation.x = -swing;
-          leftLeg.rotation.x = -swing * 0.6;
-          rightLeg.rotation.x = swing * 0.6;
-        }
-
-        renderer.render(scene, camera);
-      }
-      requestAnimationFrame(animateRoblox);
-
-      let resizeTimer = null;
-      window.addEventListener("resize", () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-          const r = DOM.rbxCanvasWrap.getBoundingClientRect();
-          if (r.width > 0 && r.height > 0) {
-            camera.aspect = r.width / r.height;
-            camera.updateProjectionMatrix();
-            renderer.setSize(Math.round(r.width), Math.round(r.height), false);
-          }
-        }, 100);
-      }, { passive: true });
-    }
-
-    /* ====================================================
        ARTWORK, YOUTUBE CHANNELS, LYRICS & PLAYS ENGINE
        ==================================================== */
-    const rawArtworks = stateCache.artworks || {};
     const artworkCache = new Map(
-      Object.entries(rawArtworks).filter(([, v]) => typeof v === "string" && v.startsWith("http"))
+      Object.entries(stateCache.artworks || {}).filter(([, v]) => typeof v === "string" && v.startsWith("http"))
     );
     const missingArtworkCache = new Map();
     const inflightArtwork = new Map();
@@ -2508,7 +1987,7 @@
     const lumCtx = lumCanvas.getContext("2d", { willReadFrequently: true });
 
     function applyCardCoverLuminance(card, imgUrl) {
-      if (!imgUrl || !imgUrl.startsWith("http") || !lumCtx) {
+      if (!imgUrl?.startsWith("http") || !lumCtx) {
         card.classList.remove("light-bg");
         return;
       }
@@ -2565,6 +2044,56 @@
       return n.toLocaleString();
     }
 
+    async function fetchYouTubeChannelMeta(channelId) {
+      const ctrl = new AbortController();
+
+      const fromMixerno = async () => {
+        const data = await fetchJson(
+          `https://mixerno.space/api/youtube-channel-counter/user/${encodeURIComponent(channelId)}`,
+          false,
+          4200,
+          ctrl.signal
+        );
+        if (!data) throw new Error();
+        const counts = Array.isArray(data.counts) ? data.counts : [];
+        const userArr = Array.isArray(data.user) ? data.user : [];
+        const findMetric = (arr, key) =>
+          arr.find(item => String(item?.value || "").toLowerCase() === key)?.count;
+
+        const subs = findMetric(counts, "subscribers") ?? findMetric(counts, "api subscribers");
+        const videos = findMetric(counts, "videos");
+        const pfp = findMetric(userArr, "pfp");
+        if (!subs && !pfp) throw new Error();
+        return { subs, videos, pfp };
+      };
+
+      const fromLemnos = async () => {
+        const data = await fetchJson(
+          `https://yt.lemnoslife.com/noKey/channels?part=snippet,statistics&id=${encodeURIComponent(channelId)}`,
+          false,
+          4200,
+          ctrl.signal
+        );
+        const item = data?.items?.[0];
+        if (!item) throw new Error();
+        const thumbs = item.snippet?.thumbnails;
+        const pfp = thumbs?.high?.url || thumbs?.medium?.url || thumbs?.default?.url || "";
+        return {
+          subs: item.statistics?.subscriberCount,
+          videos: item.statistics?.videoCount,
+          pfp
+        };
+      };
+
+      try {
+        const winner = await Promise.any([fromMixerno(), fromLemnos()]);
+        ctrl.abort();
+        return winner;
+      } catch {
+        return null;
+      }
+    }
+
     async function initFavoriteYouTubeChannels() {
       if (!DOM.favContentList) return;
       const cards = Array.from(DOM.favContentList.querySelectorAll("[data-yt-id]"));
@@ -2603,21 +2132,8 @@
           const handle = card.dataset.ytHandle;
           if (!channelId) return;
 
-          const data = await fetchJson(
-            `https://mixerno.space/api/youtube-channel-counter/user/${encodeURIComponent(channelId)}`,
-            false,
-            4500
-          );
-          if (!data) return;
-
-          const counts = Array.isArray(data.counts) ? data.counts : [];
-          const userArr = Array.isArray(data.user) ? data.user : [];
-          const findMetric = (arr, key) =>
-            arr.find(item => String(item?.value || "").toLowerCase() === key)?.count;
-
-          const rawSubs = findMetric(counts, "subscribers") ?? findMetric(counts, "api subscribers");
-          const rawVideos = findMetric(counts, "videos");
-          const pfpUrl = findMetric(userArr, "pfp");
+          const meta = await fetchYouTubeChannelMeta(channelId);
+          if (!meta) return;
 
           const bgImg = card.querySelector(".yt-pfp-bg");
           const thumbImg = card.querySelector(".yt-pfp-thumb");
@@ -2625,16 +2141,16 @@
           const fallbackPfp = `https://unavatar.io/youtube/${handle}`;
 
           let finalPfp = ytCache[channelId]?.pfp || "";
-          if (typeof pfpUrl === "string" && pfpUrl.startsWith("http")) {
-            finalPfp = pfpUrl;
-            card.dataset.artUrl = pfpUrl;
-            swapImageSmooth(bgImg, pfpUrl, fallbackPfp);
-            swapImageSmooth(thumbImg, pfpUrl, fallbackPfp);
-            applyCardCoverLuminance(card, pfpUrl);
+          if (typeof meta.pfp === "string" && meta.pfp.startsWith("http")) {
+            finalPfp = meta.pfp;
+            card.dataset.artUrl = meta.pfp;
+            swapImageSmooth(bgImg, meta.pfp, fallbackPfp);
+            swapImageSmooth(thumbImg, meta.pfp, fallbackPfp);
+            applyCardCoverLuminance(card, meta.pfp);
           }
 
-          const subsFormatted = formatCompactCount(rawSubs);
-          const videosFormatted = Number(rawVideos) > 0 ? Number(rawVideos).toLocaleString() : null;
+          const subsFormatted = formatCompactCount(meta.subs);
+          const videosFormatted = Number(meta.videos) > 0 ? Number(meta.videos).toLocaleString() : null;
           let finalStats = statsEl ? statsEl.textContent : "";
 
           if (subsFormatted && videosFormatted) {
@@ -2735,29 +2251,24 @@
     }
 
     function rememberTrackArt(artistRaw, trackRaw, url) {
-      if (!url || !url.startsWith("http")) return;
+      if (!url?.startsWith("http")) return;
       const key = getTrackCacheKey(artistRaw, trackRaw);
       missingArtworkCache.delete(key);
       if (artworkCache.get(key) !== url) {
         artworkCache.set(key, url);
-        if (artworkCache.size > 140) {
-          artworkCache.delete(artworkCache.keys().next().value);
-        }
+        if (artworkCache.size > 140) artworkCache.delete(artworkCache.keys().next().value);
         saveCache({ artworks: Object.fromEntries(artworkCache) });
       }
     }
 
-    function getCachedTrackArt(artistRaw, trackRaw) {
-      return artworkCache.get(getTrackCacheKey(artistRaw, trackRaw)) || null;
-    }
+    const getCachedTrackArt = (artistRaw, trackRaw) => artworkCache.get(getTrackCacheKey(artistRaw, trackRaw)) || null;
 
     function parseLrcLyrics(lrcText) {
       const lines = String(lrcText || "").split(/\r?\n/);
       const parsed = [];
       const timeRe = /\[(\d{1,3}):(\d{2})(?:\.(\d{1,3}))?\]/g;
 
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+      for (const line of lines) {
         timeRe.lastIndex = 0;
         const times = [];
         let m;
@@ -2767,26 +2278,23 @@
           const frac = m[3] ? parseInt(m[3].padEnd(3, "0").slice(0, 3), 10) : 0;
           times.push(min * 60000 + sec * 1000 + frac);
         }
-        if (times.length === 0) continue;
+        if (!times.length) continue;
         const text = line.replace(/\[.*?\]/g, "").trim();
         if (!text) continue;
-        for (let j = 0; j < times.length; j++) {
-          parsed.push({ timeMs: times[j], text });
-        }
+        for (const timeMs of times) parsed.push({ timeMs, text });
       }
-      parsed.sort((a, b) => a.timeMs - b.timeMs);
-      return parsed;
+      return parsed.sort((a, b) => a.timeMs - b.timeMs);
     }
 
     function isVerifiedLyricMatch(candidate, targetArtistRaw, targetTrackRaw, targetDurationSec) {
-      if (!candidate || !candidate.syncedLyrics) return false;
+      if (!candidate?.syncedLyrics) return false;
 
       const candTrack = normalizeStr(candidate.trackName || candidate.name || "");
       const candArtist = normalizeStr(candidate.artistName || "");
       if (!candTrack || !candArtist) return false;
 
-      let targetTrack = normalizeStr(targetTrackRaw);
-      let targetArtist = normalizeStr(String(targetArtistRaw || "").split(/[;,/]/)[0]);
+      const targetTrack = normalizeStr(targetTrackRaw);
+      const targetArtist = normalizeStr(String(targetArtistRaw || "").split(/[;,/]/)[0]);
       let altArtist = "";
       let altTrack = "";
 
@@ -2809,8 +2317,8 @@
 
       if (!artistMatches) return false;
 
-      if (targetDurationSec > 0 && candidate.duration > 0) {
-        if (Math.abs(candidate.duration - targetDurationSec) > 12) return false;
+      if (targetDurationSec > 0 && candidate.duration > 0 && Math.abs(candidate.duration - targetDurationSec) > 12) {
+        return false;
       }
 
       return true;
@@ -2842,18 +2350,11 @@
 
         if (!matchedRecord) {
           const searchQueries = [`${cleanArtist} ${cleanTrack}`.trim()];
-          if (String(trackRaw || "").includes(" - ")) {
-            searchQueries.push(cleanQueryPreserveAccents(trackRaw));
-          }
+          if (String(trackRaw || "").includes(" - ")) searchQueries.push(cleanQueryPreserveAccents(trackRaw));
 
-          for (let i = 0; i < searchQueries.length; i++) {
-            const q = searchQueries[i];
+          for (const q of searchQueries) {
             if (!q) continue;
-            const results = await fetchJson(
-              `https://lrclib.net/api/search?q=${encodeURIComponent(q)}`,
-              false,
-              3600
-            );
+            const results = await fetchJson(`https://lrclib.net/api/search?q=${encodeURIComponent(q)}`, false, 3600);
             if (Array.isArray(results) && results.length > 0) {
               matchedRecord = results.find(r => isVerifiedLyricMatch(r, artistRaw, trackRaw, durationSec)) || null;
               if (matchedRecord) break;
@@ -2873,13 +2374,10 @@
       return promise;
     }
 
-    function hasValidLyricsReady() {
-      return Boolean(activeLyricsData && activeLyricsData.type === "synced" && activeLyricsData.lines.length > 0);
-    }
+    const hasValidLyricsReady = () => Boolean(activeLyricsData?.type === "synced" && activeLyricsData.lines.length > 0);
 
     function buildLyricsTrackDOM() {
       lastActiveLyricIdx = -999;
-
       if (!hasValidLyricsReady()) {
         DOM.lyricsTrack.innerHTML = "";
         DOM.lyricsFloat.classList.remove("visible");
@@ -2887,11 +2385,10 @@
       }
 
       const frag = document.createDocumentFragment();
-      const lines = activeLyricsData.lines;
-      for (let i = 0; i < lines.length; i++) {
+      for (const line of activeLyricsData.lines) {
         const div = document.createElement("div");
         div.className = "lyric-item";
-        div.textContent = lines[i].text;
+        div.textContent = line.text;
         frag.appendChild(div);
       }
       DOM.lyricsTrack.replaceChildren(frag);
@@ -2905,7 +2402,7 @@
       }
 
       const children = DOM.lyricsTrack.children;
-      if (children.length === 0) return;
+      if (!children.length) return;
 
       const now = Date.now();
       const start = activeSpotifyTrack.timestamps?.start || now;
@@ -2925,15 +2422,7 @@
 
       for (let i = 0; i < children.length; i++) {
         const el = children[i];
-        if (i === idx) {
-          el.className = "lyric-item is-active";
-        } else if (i === idx - 1) {
-          el.className = "lyric-item is-prev";
-        } else if (i === idx + 1) {
-          el.className = "lyric-item is-next";
-        } else {
-          el.className = "lyric-item";
-        }
+        el.className = i === idx ? "lyric-item is-active" : (i === idx - 1 || i === idx + 1) ? "lyric-item is-prev" : "lyric-item";
       }
 
       const activeEl = children[idx];
@@ -2969,23 +2458,17 @@
       DOM.lyricsFloat.classList.remove("visible");
       DOM.lyricsTrack.innerHTML = "";
 
-      fetchLyricsForTrack(
-        activeSpotifyTrack.artist,
-        activeSpotifyTrack.song,
-        activeSpotifyTrack.timestamps
-      ).then(res => {
+      fetchLyricsForTrack(activeSpotifyTrack.artist, activeSpotifyTrack.song, activeSpotifyTrack.timestamps).then(res => {
         if (activeLyricsTrackKey === key) {
           activeLyricsData = res;
           buildLyricsTrackDOM();
-          if (isHoveringNowPlaying && hasValidLyricsReady()) {
-            DOM.lyricsFloat.classList.add("visible");
-          }
+          if (isHoveringNowPlaying && hasValidLyricsReady()) DOM.lyricsFloat.classList.add("visible");
         }
       });
     }
 
     function pushToDiscordHistory(trackObj) {
-      if (!trackObj || !trackObj.song) return;
+      if (!trackObj?.song) return;
       const nowUts = Math.floor(Date.now() / 1000);
       const entry = {
         name: trackObj.song,
@@ -3013,20 +2496,17 @@
       const lower = (act.name || "").toLowerCase().trim();
       if (lower.includes("spotify")) {
         if (act.sync_id) return `https://open.spotify.com/track/${act.sync_id}`;
-        if (act.details) return `https://open.spotify.com/search/${encodeURIComponent(act.details + " " + (act.state || ""))}`;
+        if (act.details) return `https://open.spotify.com/search/${encodeURIComponent(`${act.details} ${act.state || ""}`)}`;
         return "https://open.spotify.com";
       }
       if (lower.includes("soundcloud")) {
-        if (act.details) return `https://soundcloud.com/search?q=${encodeURIComponent(act.details + " " + (act.state || ""))}`;
-        return "https://soundcloud.com";
+        return act.details ? `https://soundcloud.com/search?q=${encodeURIComponent(`${act.details} ${act.state || ""}`)}` : "https://soundcloud.com";
       }
       if (lower.includes("youtube music") || lower.includes("yt music") || lower.includes("youtubemusic")) {
-        if (act.details) return `https://music.youtube.com/search?q=${encodeURIComponent(act.details + " " + (act.state || ""))}`;
-        return "https://music.youtube.com";
+        return act.details ? `https://music.youtube.com/search?q=${encodeURIComponent(`${act.details} ${act.state || ""}`)}` : "https://music.youtube.com";
       }
       if (act.url && /^https?:\/\//i.test(act.url)) return act.url;
-      for (let i = 0; i < APP_URL_MAP.length; i++) {
-        const entry = APP_URL_MAP[i];
+      for (const entry of APP_URL_MAP) {
         if (entry.match.some(k => lower.includes(k))) return entry.url;
       }
       return act.name ? `https://www.google.com/search?q=${encodeURIComponent(act.name)}` : null;
@@ -3041,17 +2521,11 @@
         if (act.application_id) return `https://cdn.discordapp.com/app-assets/${act.application_id}/${rawImg}.png`;
       }
       const lower = (act.name || "").toLowerCase();
-      if (lower.includes("zed")) return "https://www.google.com/s2/favicons?domain=zed.dev&sz=64";
-      if (lower.includes("helium")) return "https://www.google.com/s2/favicons?domain=helium.computer&sz=64";
-      if (lower.includes("mullvad")) return "https://www.google.com/s2/favicons?domain=mullvad.net&sz=64";
-      if (lower.includes("code")) return "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64";
-      if (lower.includes("roblox") || lower.includes("sober")) return "https://www.google.com/s2/favicons?domain=roblox.com&sz=64";
-      if (lower.includes("modrinth")) return "https://www.google.com/s2/favicons?domain=modrinth.com&sz=64";
-      if (lower.includes("lunar") || lower.includes("minecraft")) return "https://www.google.com/s2/favicons?domain=lunarclient.com&sz=64";
-      if (lower.includes("assetto")) return "https://www.google.com/s2/favicons?domain=assettocorsa.gg&sz=64";
-      if (lower.includes("soundcloud")) return "https://www.google.com/s2/favicons?domain=soundcloud.com&sz=64";
-      if (lower.includes("youtube music") || lower.includes("yt music")) return "https://www.google.com/s2/favicons?domain=music.youtube.com&sz=64";
-      if (lower.includes("spotify")) return "https://www.google.com/s2/favicons?domain=spotify.com&sz=64";
+      for (const [keywords, domain] of FAVICON_DOMAINS) {
+        if (keywords.some(k => lower.includes(k))) {
+          return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+        }
+      }
       return null;
     }
 
@@ -3063,10 +2537,7 @@
       return "spotify";
     }
 
-    function getListeningAppIconHTML(appName) {
-      const key = String(appName || "spotify").toLowerCase();
-      return MONO_MUSIC_SVGS[key] || MONO_MUSIC_SVGS.spotify;
-    }
+    const getListeningAppIconHTML = appName => MONO_MUSIC_SVGS[String(appName || "spotify").toLowerCase()] || MONO_MUSIC_SVGS.spotify;
 
     function extractLiveSpotifyFromPresence(data) {
       if (!data) return null;
@@ -3074,15 +2545,7 @@
       const musicAct = acts.find(a => {
         if (!a) return false;
         const n = String(a.name || "").toLowerCase();
-        return (
-          n === "spotify" ||
-          n.includes("soundcloud") ||
-          n.includes("youtube music") ||
-          n.includes("yt music") ||
-          n.includes("youtubemusic") ||
-          a.id === "spotify:1" ||
-          a.type === 2
-        );
+        return n === "spotify" || n.includes("soundcloud") || n.includes("youtube music") || n.includes("yt music") || n.includes("youtubemusic") || a.id === "spotify:1" || a.type === 2;
       });
 
       const detectedApp = detectMusicApp(musicAct, data);
@@ -3090,11 +2553,10 @@
 
       if (musicAct && detectedApp !== "spotify" && musicAct.details) {
         const artist = String(musicAct.state || "").replace(/;\s*/g, ", ").trim();
-        const art = resolveActivityIcon(musicAct) || "";
         return {
           song: musicAct.details,
           artist: artist || "Unknown Artist",
-          art,
+          art: resolveActivityIcon(musicAct) || "",
           url: resolveActivityUrl(musicAct) || `https://www.last.fm/user/${LASTFM_USERNAME}`,
           timestamps: musicAct.timestamps || null,
           trackId: musicAct.sync_id || `${musicAct.details}:${artist}`,
@@ -3102,31 +2564,26 @@
         };
       }
 
-      if (data.spotify && data.spotify.song) {
+      if (data.spotify?.song) {
         const sp = data.spotify;
         const artist = String(sp.artist || "").replace(/;\s*/g, ", ").trim();
-        const art = sp.album_art_url || (musicAct ? resolveActivityIcon(musicAct) : "");
-        const url = sp.track_id
-          ? `https://open.spotify.com/track/${sp.track_id}`
-          : `https://open.spotify.com/search/${encodeURIComponent(sp.song + " " + artist)}`;
         return {
           song: sp.song,
           artist: artist || "Unknown Artist",
-          art: art || "",
-          url,
+          art: sp.album_art_url || (musicAct ? resolveActivityIcon(musicAct) : "") || "",
+          url: sp.track_id ? `https://open.spotify.com/track/${sp.track_id}` : `https://open.spotify.com/search/${encodeURIComponent(`${sp.song} ${artist}`)}`,
           timestamps: sp.timestamps || musicAct?.timestamps || null,
           trackId: sp.track_id || `${sp.song}:${artist}`,
           app: "spotify"
         };
       }
 
-      if (musicAct && musicAct.details) {
+      if (musicAct?.details) {
         const artist = String(musicAct.state || "").replace(/;\s*/g, ", ").trim();
-        const art = resolveActivityIcon(musicAct) || "";
         return {
           song: musicAct.details,
           artist: artist || "Unknown Artist",
-          art,
+          art: resolveActivityIcon(musicAct) || "",
           url: resolveActivityUrl(musicAct) || `https://www.google.com/search?q=${encodeURIComponent(musicAct.details)}`,
           timestamps: musicAct.timestamps || null,
           trackId: musicAct.sync_id || `${musicAct.details}:${artist}`,
@@ -3154,7 +2611,7 @@
 
     function scheduleSongEndRefresh(timestamps) {
       clearTimeout(songEndTimeout);
-      if (!timestamps || !timestamps.end) return;
+      if (!timestamps?.end) return;
       const remaining = timestamps.end - Date.now();
       if (remaining > 0 && remaining < 1800000) {
         songEndTimeout = setTimeout(handleSongFinishTransition, remaining + 120);
@@ -3184,15 +2641,8 @@
       }
 
       liveProgressAnim = liveProgressEl.animate(
-        [
-          { transform: `scaleX(${ratio.toFixed(4)})` },
-          { transform: "scaleX(1)" }
-        ],
-        {
-          duration: remaining,
-          easing: "linear",
-          fill: "forwards"
-        }
+        [{ transform: `scaleX(${ratio.toFixed(4)})` }, { transform: "scaleX(1)" }],
+        { duration: remaining, easing: "linear", fill: "forwards" }
       );
     }
 
@@ -3207,7 +2657,7 @@
       if (sig === lastActivitySig && DOM.activityList.children.length > 0) return;
       lastActivitySig = sig;
 
-      if (items.length === 0) {
+      if (!items.length) {
         DOM.activityList.innerHTML = `
           <div class="activity-row" data-empty="true" style="justify-content: center; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 11.5px;">
             <span>idle / nothing playing</span>
@@ -3219,9 +2669,7 @@
         DOM.activityList.textContent = "";
       }
 
-      while (DOM.activityList.children.length > items.length) {
-        DOM.activityList.lastElementChild.remove();
-      }
+      while (DOM.activityList.children.length > items.length) DOM.activityList.lastElementChild.remove();
 
       while (DOM.activityList.children.length < items.length) {
         const row = document.createElement("div");
@@ -3307,16 +2755,12 @@
       const liveSp = extractLiveSpotifyFromPresence(data);
       const nextKey = liveSp ? `${liveSp.trackId}:${liveSp.song}:${liveSp.app}` : "";
 
-      if (prevTrack && prevKey && prevKey !== nextKey) {
-        pushToDiscordHistory(prevTrack);
-      }
+      if (prevTrack && prevKey && prevKey !== nextKey) pushToDiscordHistory(prevTrack);
 
       if (liveSp) {
         activeSpotifyTrack = liveSp;
         activeSpotifyKey = nextKey;
-        if (liveSp.art && liveSp.art.startsWith("http")) {
-          rememberTrackArt(liveSp.artist, liveSp.song, liveSp.art);
-        }
+        if (liveSp.art?.startsWith("http")) rememberTrackArt(liveSp.artist, liveSp.song, liveSp.art);
         scheduleSongEndRefresh(liveSp.timestamps);
         syncActiveTrackLyrics();
       } else {
@@ -3379,31 +2823,19 @@
         return;
       }
 
-      socket.onopen = () => {
-        wsReconnectAttempts = 0;
-      };
-
+      socket.onopen = () => { wsReconnectAttempts = 0; };
       socket.onerror = () => {};
-
       socket.onmessage = event => {
         let msg;
-        try {
-          msg = JSON.parse(event.data);
-        } catch {
-          return;
-        }
+        try { msg = JSON.parse(event.data); } catch { return; }
         if (msg.op === 1) {
           clearInterval(heartbeatInterval);
           heartbeatInterval = setInterval(() => {
             if (socket?.readyState === WebSocket.OPEN) {
-              try {
-                socket.send('{"op":3}');
-              } catch {}
+              try { socket.send('{"op":3}'); } catch {}
             }
           }, msg.d.heartbeat_interval);
-          try {
-            socket.send(`{"op":2,"d":{"subscribe_to_id":"${DISCORD_ID}"}}`);
-          } catch {}
+          try { socket.send(`{"op":2,"d":{"subscribe_to_id":"${DISCORD_ID}"}}`); } catch {}
         } else if (msg.t === "INIT_STATE" || msg.t === "PRESENCE_UPDATE") {
           applyPresenceData(msg.d);
           if (msg.t === "PRESENCE_UPDATE") fetchDiscordProfile();
@@ -3418,32 +2850,17 @@
       };
     }
 
-    function applyCloudServer(guild, online, members) {
+    function applyDiscordServer(nameEl, iconEl, descEl, guild, online, members) {
       if (!guild) return;
-      if (guild.name && DOM.cloudName.textContent !== guild.name) DOM.cloudName.textContent = guild.name;
+      if (guild.name && nameEl.textContent !== guild.name) nameEl.textContent = guild.name;
       if (guild.icon) {
         const ext = guild.icon.startsWith("a_") ? "gif" : "png";
-        const url = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.${ext}?size=128`;
-        swapImageSmooth(DOM.cloudIcon, url);
+        swapImageSmooth(iconEl, `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.${ext}?size=128`);
       }
       const desc = guild.description
         ? `${guild.description} (${Number(members || 0).toLocaleString()} members)`
         : `${Number(online || 0).toLocaleString()} online · ${Number(members || 0).toLocaleString()} members`;
-      if (DOM.cloudDesc.textContent !== desc) DOM.cloudDesc.textContent = desc;
-    }
-
-    function applySecondServer(guild, online, members) {
-      if (!guild) return;
-      if (guild.name && DOM.secondName.textContent !== guild.name) DOM.secondName.textContent = guild.name;
-      if (guild.icon) {
-        const ext = guild.icon.startsWith("a_") ? "gif" : "png";
-        const url = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.${ext}?size=128`;
-        swapImageSmooth(DOM.secondIcon, url);
-      }
-      const desc = guild.description
-        ? `${guild.description} (${Number(members || 0).toLocaleString()} members)`
-        : `${Number(online || 0).toLocaleString()} online · ${Number(members || 0).toLocaleString()} members`;
-      if (DOM.secondDesc.textContent !== desc) DOM.secondDesc.textContent = desc;
+      if (descEl.textContent !== desc) descEl.textContent = desc;
     }
 
     function fetchTrackCoverUrl(artistRaw, trackRaw) {
@@ -3452,30 +2869,42 @@
 
       const key = getTrackCacheKey(artistRaw, trackRaw);
       const negTs = missingArtworkCache.get(key);
-      if (negTs && Date.now() - negTs < 600000) {
-        return Promise.resolve(null);
-      }
-
+      if (negTs && Date.now() - negTs < 600000) return Promise.resolve(null);
       if (inflightArtwork.has(key)) return inflightArtwork.get(key);
 
       const firstArtist = String(artistRaw || "").split(/[;,/]/)[0].trim();
       const query = `${normalizeStr(firstArtist)} ${normalizeStr(trackRaw)}`.trim();
       const raceCtrl = new AbortController();
 
+      const fromDeezer = async () => {
+        const dz = await fetchJson(
+          `https://api.deezer.com/search?q=${encodeURIComponent(query)}&limit=5`,
+          false,
+          3600,
+          raceCtrl.signal
+        );
+        if (Array.isArray(dz?.data) && dz.data.length > 0) {
+          const matched =
+            dz.data.find(r => isSameSong(r.artist?.name, r.title, firstArtist, trackRaw)) ||
+            dz.data.find(r => normalizeStr(r.title) === normalizeStr(trackRaw));
+          const cover = matched?.album?.cover_big || matched?.album?.cover_medium;
+          if (cover?.startsWith("http")) return cover;
+        }
+        throw new Error();
+      };
+
       const fromItunes = async () => {
         const itunesData = await fetchJson(
           `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&entity=song&limit=5`,
           false,
-          3800,
+          3600,
           raceCtrl.signal
         );
         if (Array.isArray(itunesData?.results) && itunesData.results.length > 0) {
           const matched =
             itunesData.results.find(r => isSameSong(r.artistName, r.trackName, firstArtist, trackRaw)) ||
             itunesData.results.find(r => normalizeStr(r.trackName) === normalizeStr(trackRaw));
-          if (matched?.artworkUrl100) {
-            return matched.artworkUrl100.replace("100x100bb", "300x300bb");
-          }
+          if (matched?.artworkUrl100) return matched.artworkUrl100.replace("100x100bb", "500x500bb");
         }
         throw new Error();
       };
@@ -3484,7 +2913,7 @@
         const trackInfo = await fetchJson(
           `https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=${LASTFM_API_KEY}&artist=${encodeURIComponent(firstArtist)}&track=${encodeURIComponent(trackRaw)}&autocorrect=1&format=json`,
           false,
-          3800,
+          3600,
           raceCtrl.signal
         );
         const lfmImages = trackInfo?.track?.album?.image;
@@ -3498,7 +2927,7 @@
         throw new Error();
       };
 
-      const promise = Promise.any([fromItunes(), fromLastFm()])
+      const promise = Promise.any([fromDeezer(), fromItunes(), fromLastFm()])
         .then(winnerUrl => {
           raceCtrl.abort();
           rememberTrackArt(artistRaw, trackRaw, winnerUrl);
@@ -3574,8 +3003,7 @@
       }
 
       const pastLfm = [];
-      for (let i = 0; i < lfmSource.length; i++) {
-        const t = lfmSource[i];
+      for (const t of lfmSource) {
         if (!t || t["@attr"]?.nowplaying === "true") continue;
         const rawArtist = t.artist?.["#text"] || t.artist?.name || "Unknown Artist";
         const rawName = t.name || "Unknown Track";
@@ -3594,8 +3022,7 @@
       const topLfm = pastLfm[0];
       const unSyncedDiscord = [];
       const nowSec = Math.floor(Date.now() / 1000);
-      for (let i = 0; i < recentDiscordHistory.length; i++) {
-        const h = recentDiscordHistory[i];
+      for (const h of recentDiscordHistory) {
         if (result[0]?.isNow && isSameSong(result[0].artist, result[0].name, h.artist, h.name) && Math.abs(nowSec - h.uts) < 15) {
           continue;
         }
@@ -3622,10 +3049,7 @@
       return result.slice(0, 10);
     }
 
-    function syncLiveAndRenderTracks(force = false) {
-      const combined = buildCombinedTrackList();
-      renderTracksDOM(combined, lastFmTotal, force);
-    }
+    const syncLiveAndRenderTracks = (force = false) => renderTracksDOM(buildCombinedTrackList(), lastFmTotal, force);
 
     function refreshRelativeTimeLabels(rowEl, tracks) {
       if (!rowEl) return;
@@ -3635,9 +3059,7 @@
         const metaTop = rowEl.children[idx]?._refs?.metaTop;
         if (metaTop) {
           const relText = getRelativeTime(track.uts);
-          if (metaTop.textContent !== relText) {
-            metaTop.innerHTML = `<span>${escapeHTML(relText)}</span>`;
-          }
+          if (metaTop.textContent !== relText) metaTop.innerHTML = `<span>${escapeHTML(relText)}</span>`;
         }
       }
     }
@@ -3647,7 +3069,7 @@
         const formatted = `${Number(totalScrobbles).toLocaleString()} scrobbles`;
         if (DOM.lastfmStats.textContent !== formatted) DOM.lastfmStats.textContent = formatted;
       }
-      if (!Array.isArray(list) || list.length === 0) return;
+      if (!Array.isArray(list) || !list.length) return;
 
       const tracks = list.slice(0, 10);
       const sig = tracks
@@ -3668,9 +3090,7 @@
       }
       rowEl.className = `plays-row${rowHasLive ? " has-live" : ""}`;
 
-      while (rowEl.children.length > tracks.length) {
-        rowEl.lastElementChild.remove();
-      }
+      while (rowEl.children.length > tracks.length) rowEl.lastElementChild.remove();
       while (rowEl.children.length < tracks.length) {
         const card = document.createElement("a");
         card.className = "play-card";
@@ -3823,8 +3243,7 @@
     function revealSite() {
       if (siteRevealed) return;
       siteRevealed = true;
-      const elapsed = performance.now() - BOOT_START;
-      const waitMs = Math.max(0, BOOT_MIN_MS - elapsed);
+      const waitMs = Math.max(0, BOOT_MIN_MS - (performance.now() - BOOT_START));
 
       setTimeout(() => {
         if (DOM.loader && !DOM.loader.classList.contains("hidden")) {
@@ -3839,8 +3258,6 @@
     (async function init() {
       syncHandleCopyWidths();
       initFavoriteYouTubeChannels();
-      initMinecraft3DViewer();
-      initRoblox3DViewer();
 
       const hasCachedState = Boolean(stateCache.dstnUser || stateCache.presence);
       if (stateCache.dstnUser) updateUserHeader(stateCache.dstnUser, stateCache.dstnFull);
@@ -3848,24 +3265,30 @@
       if (stateCache.badges) renderDiscordBadges(stateCache.badges);
       if (stateCache.presence) applyPresenceData(stateCache.presence);
       else renderActivityFeed([]);
-      if (stateCache.cloud) applyCloudServer(stateCache.cloud.guild, stateCache.cloud.online, stateCache.cloud.members);
-      if (stateCache.secondCloud) applySecondServer(stateCache.secondCloud.guild, stateCache.secondCloud.online, stateCache.secondCloud.members);
+      if (stateCache.cloud) {
+        applyDiscordServer(DOM.cloudName, DOM.cloudIcon, DOM.cloudDesc, stateCache.cloud.guild, stateCache.cloud.online, stateCache.cloud.members);
+      }
+      if (stateCache.secondCloud) {
+        applyDiscordServer(DOM.secondName, DOM.secondIcon, DOM.secondDesc, stateCache.secondCloud.guild, stateCache.secondCloud.online, stateCache.secondCloud.members);
+      }
       if (lastFmTracks.length > 0) syncLiveAndRenderTracks();
 
       if (hasCachedState) revealSite();
 
       const pLanyard = EARLY.lanyard.then(res => { if (res?.data) applyPresenceData(res.data); });
-      const pDstn = EARLY.dstn.then(data => { if (data) applyDstnPayload(data); });
+      const pProfile = EARLY.profile.then(data => { if (data) applyDstnPayload(data); });
       const pLastFm = EARLY.lastfm.then(data => { if (data) applyLastFmPayload(data); });
+
       EARLY.invite.then(d => {
         if (d?.guild) {
-          applyCloudServer(d.guild, d.approximate_presence_count, d.approximate_member_count);
+          applyDiscordServer(DOM.cloudName, DOM.cloudIcon, DOM.cloudDesc, d.guild, d.approximate_presence_count, d.approximate_member_count);
           saveCache({ cloud: { guild: d.guild, online: d.approximate_presence_count, members: d.approximate_member_count } });
         }
       });
+
       EARLY.invite2.then(d => {
         if (d?.guild) {
-          applySecondServer(d.guild, d.approximate_presence_count, d.approximate_member_count);
+          applyDiscordServer(DOM.secondName, DOM.secondIcon, DOM.secondDesc, d.guild, d.approximate_presence_count, d.approximate_member_count);
           saveCache({ secondCloud: { guild: d.guild, online: d.approximate_presence_count, members: d.approximate_member_count } });
         }
       });
@@ -3874,7 +3297,7 @@
 
       if (!hasCachedState) {
         await Promise.race([
-          Promise.allSettled([pLanyard, pDstn, pLastFm]),
+          Promise.allSettled([pLanyard, pProfile, pLastFm]),
           new Promise(r => setTimeout(r, 480))
         ]);
         revealSite();

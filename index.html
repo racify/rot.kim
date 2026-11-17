@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#050507" />
   <title>rot.kim</title>
-  <link id="dynamic-favicon" rel="icon" href="favicon.png" type="image/png" />
+  <link id="dynamic-favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2314151a'/%3E%3C/svg%3E" type="image/svg+xml" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,6 +17,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="preconnect" href="https://i.scdn.co" crossorigin />
   <link rel="preconnect" href="https://itunes.apple.com" crossorigin />
+  <link rel="preconnect" href="https://unavatar.io" crossorigin />
 
   <script>
     (function setDomainTabTitle() {
@@ -41,6 +42,7 @@
 
     const DISCORD_ID = "488047218138546179";
     const CLOUD_INVITE = "rKZGYvmUUC";
+    const SECOND_INVITE = "zZf4RAP6Gq";
     const LASTFM_API_KEY = "56f986f70954d1ad8c8b3ec3aec33f83";
     const LASTFM_USERNAME = "renumerate";
     const BG_MEDIA_URL = "bg.png";
@@ -56,7 +58,7 @@
       "background.webp",
       "background.mp4"
     ];
-    const CACHE_KEY = "zack_cache_v16";
+    const CACHE_KEY = "zack_cache_v19";
     const BOOT_MIN_MS = 140;
     const BOOT_START = performance.now();
 
@@ -89,7 +91,8 @@
       lanyard: fetchJson(`https://api.lanyard.rest/v1/users/${DISCORD_ID}`, true),
       dstn: fetchJson(`https://dcdn.dstn.to/profile/${DISCORD_ID}`, true),
       lastfm: fetchJson(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${LASTFM_USERNAME}&api_key=${LASTFM_API_KEY}&format=json&limit=10`, true),
-      invite: fetchJson(`https://discord.com/api/v10/invites/${CLOUD_INVITE}?with_counts=true`)
+      invite: fetchJson(`https://discord.com/api/v10/invites/${CLOUD_INVITE}?with_counts=true`),
+      invite2: fetchJson(`https://discord.com/api/v10/invites/${SECOND_INVITE}?with_counts=true`)
     };
   </script>
 
@@ -124,9 +127,7 @@
       --tag-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.095), rgba(161, 161, 170, 0.055));
       --tag-border: rgba(228, 228, 231, 0.2);
 
-      /* Ultra-Smooth Non-Snappy Silk Curves */
-      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-      --ease-silk: cubic-bezier(0.19, 1, 0.22, 1);
+      --ease-out: cubic-bezier(0.216, 1, 0.31, 1);
       --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 
       --cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M5.25 1.5h1.5v3.75h3.75v1.5H6.75v3.75h-1.5V6.75H1.5v-1.5h3.75V1.5z' fill='%23e4e4e7'/%3E%3C/svg%3E") 6 6, crosshair;
@@ -141,7 +142,7 @@
       cursor: var(--cursor);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
+      text-rendering: geometricPrecision;
     }
 
     ::selection {
@@ -150,7 +151,7 @@
       -webkit-text-fill-color: #ffffff;
     }
 
-    img, video, svg, .status-dot, .play-live-pip, .eq-bars {
+    img, video, svg, canvas, .status-dot, .play-live-pip, .eq-bars {
       user-select: none;
       -webkit-user-select: none;
       -webkit-user-drag: none;
@@ -256,7 +257,7 @@
 
     .page-wrap {
       position: relative;
-      z-index: 2;
+      z-index: 3;
       width: 100%;
       max-width: 492px;
       margin: auto;
@@ -281,6 +282,7 @@
     body.loaded .page-wrap > *:nth-child(3) { transition-delay: 90ms; }
     body.loaded .page-wrap > *:nth-child(4) { transition-delay: 135ms; }
     body.loaded .page-wrap > *:nth-child(5) { transition-delay: 180ms; }
+    body.loaded .page-wrap > *:nth-child(6) { transition-delay: 225ms; }
 
     @media (max-width: 540px) {
       body { padding: 32px 16px; }
@@ -507,7 +509,6 @@
       flex-shrink: 0;
     }
 
-    /* Badges aligned flush with the bottom of the username */
     .discord-badges {
       display: inline-flex;
       align-items: flex-end;
@@ -519,6 +520,13 @@
 
     .discord-badges:empty { display: none; }
 
+    .discord-badge-item {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+    }
+
     .discord-badge-icon {
       width: 15.5px;
       height: 15.5px;
@@ -529,9 +537,9 @@
       transition: transform 0.68s var(--ease-out), filter 0.68s var(--ease-out);
     }
 
-    .discord-badge-icon:hover {
-      transform: translateY(-1px) scale(1.06);
-      filter: drop-shadow(0 2px 6px var(--accent-glow));
+    .discord-badge-item:hover .discord-badge-icon {
+      transform: translateY(-1.5px) scale(1.14);
+      filter: drop-shadow(0 2px 7px var(--accent-glow));
     }
 
     .bio-line {
@@ -586,7 +594,13 @@
       transform: translateX(2.5px);
     }
 
-    /* Project Row */
+    /* Projects Container */
+    .projects-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
     .project-row {
       display: flex;
       align-items: center;
@@ -761,7 +775,7 @@
     }
 
     /* ====================================================
-       RECENT PLAYS + CARDLESS FLOATING LYRICS
+       EXPANDABLE CARDS (FAVORITE CONTENT & RECENT PLAYS)
        ==================================================== */
     .plays-stack {
       position: relative;
@@ -803,7 +817,8 @@
       align-items: flex-end;
       gap: 6px;
       transform: translate3d(0, 0, 0);
-      transition: transform 0.86s var(--ease-out);
+      transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
     }
 
     .lyrics-track.no-transition {
@@ -823,9 +838,9 @@
       transform: translateY(3px);
       text-shadow: 0 2px 10px rgba(0, 0, 0, 0.92);
       transition:
-        transform 0.86s var(--ease-out),
-        opacity 0.86s var(--ease-out),
-        color 0.86s var(--ease-out);
+        transform 0.95s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.95s cubic-bezier(0.16, 1, 0.3, 1),
+        color 0.95s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .lyric-item.is-prev,
@@ -844,7 +859,7 @@
       text-shadow: 0 2px 12px rgba(0, 0, 0, 0.96), 0 0 16px rgba(255, 255, 255, 0.18);
     }
 
-    @media (max-width: 980px) {
+    @media (max-width: 1120px) {
       .lyrics-float {
         right: auto;
         left: 0;
@@ -1167,8 +1182,22 @@
     .page-footer {
       display: flex;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: space-between;
       margin-top: -6px;
+    }
+
+    .footer-server-link {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.65s var(--ease-out), transform 0.65s var(--ease-out);
+    }
+
+    .footer-server-link:hover {
+      color: var(--accent-bright);
+      transform: translateX(2px);
     }
 
     .social-links {
@@ -1247,16 +1276,26 @@
 
     <section class="sec-block">
       <div class="sec-head">
-        <span>current project</span>
+        <span>current projects</span>
       </div>
 
-      <a id="cloud-project-row" href="https://discord.gg/rKZGYvmUUC" target="_blank" rel="noopener noreferrer" class="project-row">
-        <img id="cloud-proj-icon" class="project-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" decoding="async" />
-        <div class="project-info">
-          <span class="project-title" id="cloud-proj-name">moon men</span>
-          <span class="project-desc" id="cloud-proj-desc">owned by @rotkim</span>
-        </div>
-      </a>
+      <div class="projects-list">
+        <a id="cloud-project-row" href="https://discord.gg/rKZGYvmUUC" target="_blank" rel="noopener noreferrer" class="project-row">
+          <img id="cloud-proj-icon" class="project-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" decoding="async" />
+          <div class="project-info">
+            <span class="project-title" id="cloud-proj-name">moon men</span>
+            <span class="project-desc" id="cloud-proj-desc">owned by @rotkim</span>
+          </div>
+        </a>
+
+        <a id="second-project-row" href="https://discord.gg/zZf4RAP6Gq" target="_blank" rel="noopener noreferrer" class="project-row">
+          <img id="second-proj-icon" class="project-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" decoding="async" />
+          <div class="project-info">
+            <span class="project-title" id="second-proj-name">discord server</span>
+            <span class="project-desc" id="second-proj-desc">discord.gg/zZf4RAP6Gq</span>
+          </div>
+        </a>
+      </div>
     </section>
 
     <section class="sec-block">
@@ -1265,6 +1304,104 @@
       </div>
 
       <div class="activity-list" id="activity-list"></div>
+    </section>
+
+    <section class="sec-block">
+      <div class="sec-head">
+        <span>favorite content</span>
+      </div>
+
+      <div class="plays-row" id="favorite-content-list">
+        <a href="https://www.youtube.com/@Vsauce" target="_blank" rel="noopener noreferrer" class="play-card" data-yt-id="UC6nSFpj9HTCZ5t-N3Rm3-HA" data-yt-handle="Vsauce">
+          <img class="play-bg yt-pfp-bg" src="https://unavatar.io/youtube/Vsauce" alt="" loading="lazy" decoding="async" />
+          <div class="play-expanded">
+            <img class="play-thumb yt-pfp-thumb" src="https://unavatar.io/youtube/Vsauce" alt="Vsauce" loading="lazy" decoding="async" />
+            <div class="play-meta">
+              <div class="play-meta-top">
+                <svg class="play-app-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                <span>@Vsauce</span>
+              </div>
+              <div class="play-title">Vsauce</div>
+              <div class="play-artist yt-stats">25.4M subscribers · 674 videos</div>
+            </div>
+          </div>
+        </a>
+
+        <a href="https://www.youtube.com/@veritasium" target="_blank" rel="noopener noreferrer" class="play-card" data-yt-id="UCHnyfMqiRRG1u-2MsSQLbXA" data-yt-handle="veritasium">
+          <img class="play-bg yt-pfp-bg" src="https://unavatar.io/youtube/veritasium" alt="" loading="lazy" decoding="async" />
+          <div class="play-expanded">
+            <img class="play-thumb yt-pfp-thumb" src="https://unavatar.io/youtube/veritasium" alt="Veritasium" loading="lazy" decoding="async" />
+            <div class="play-meta">
+              <div class="play-meta-top">
+                <svg class="play-app-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                <span>@veritasium</span>
+              </div>
+              <div class="play-title">Veritasium</div>
+              <div class="play-artist yt-stats">21.5M subscribers · 551 videos</div>
+            </div>
+          </div>
+        </a>
+
+        <a href="https://www.youtube.com/@fern-tv" target="_blank" rel="noopener noreferrer" class="play-card" data-yt-id="UCODHrzPMGbNv67e84WDZhQQ" data-yt-handle="fern-tv">
+          <img class="play-bg yt-pfp-bg" src="https://unavatar.io/youtube/fern-tv" alt="" loading="lazy" decoding="async" />
+          <div class="play-expanded">
+            <img class="play-thumb yt-pfp-thumb" src="https://unavatar.io/youtube/fern-tv" alt="fern" loading="lazy" decoding="async" />
+            <div class="play-meta">
+              <div class="play-meta-top">
+                <svg class="play-app-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                <span>@fern-tv</span>
+              </div>
+              <div class="play-title">fern</div>
+              <div class="play-artist yt-stats">5.7M subscribers · 148 videos</div>
+            </div>
+          </div>
+        </a>
+
+        <a href="https://www.youtube.com/@LEMMiNO" target="_blank" rel="noopener noreferrer" class="play-card" data-yt-id="UCRcgy6GzDeccI7dkbbBna3Q" data-yt-handle="LEMMiNO">
+          <img class="play-bg yt-pfp-bg" src="https://unavatar.io/youtube/LEMMiNO" alt="" loading="lazy" decoding="async" />
+          <div class="play-expanded">
+            <img class="play-thumb yt-pfp-thumb" src="https://unavatar.io/youtube/LEMMiNO" alt="LEMMiNO" loading="lazy" decoding="async" />
+            <div class="play-meta">
+              <div class="play-meta-top">
+                <svg class="play-app-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                <span>@LEMMiNO</span>
+              </div>
+              <div class="play-title">LEMMiNO</div>
+              <div class="play-artist yt-stats">5.94M subscribers · 171 videos</div>
+            </div>
+          </div>
+        </a>
+
+        <a href="https://www.youtube.com/@Coffeezilla" target="_blank" rel="noopener noreferrer" class="play-card" data-yt-id="UCFQMnBA3CS502aghlcr0_aw" data-yt-handle="Coffeezilla">
+          <img class="play-bg yt-pfp-bg" src="https://unavatar.io/youtube/Coffeezilla" alt="" loading="lazy" decoding="async" />
+          <div class="play-expanded">
+            <img class="play-thumb yt-pfp-thumb" src="https://unavatar.io/youtube/Coffeezilla" alt="Coffeezilla" loading="lazy" decoding="async" />
+            <div class="play-meta">
+              <div class="play-meta-top">
+                <svg class="play-app-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                <span>@Coffeezilla</span>
+              </div>
+              <div class="play-title">Coffeezilla</div>
+              <div class="play-artist yt-stats">4.77M subscribers · 533 videos</div>
+            </div>
+          </div>
+        </a>
+
+        <a href="https://www.youtube.com/@NileBlue" target="_blank" rel="noopener noreferrer" class="play-card" data-yt-id="UC1D3yD4wlPMico0dss264XA" data-yt-handle="NileBlue">
+          <img class="play-bg yt-pfp-bg" src="https://unavatar.io/youtube/NileBlue" alt="" loading="lazy" decoding="async" />
+          <div class="play-expanded">
+            <img class="play-thumb yt-pfp-thumb" src="https://unavatar.io/youtube/NileBlue" alt="NileBlue" loading="lazy" decoding="async" />
+            <div class="play-meta">
+              <div class="play-meta-top">
+                <svg class="play-app-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                <span>@NileBlue</span>
+              </div>
+              <div class="play-title">NileBlue</div>
+              <div class="play-artist yt-stats">3.66M subscribers · 120 videos</div>
+            </div>
+          </div>
+        </a>
+      </div>
     </section>
 
     <section class="sec-block">
@@ -1287,6 +1424,7 @@
     </section>
 
     <footer class="page-footer">
+      <a href="https://discord.com/users/488047218138546179" target="_blank" rel="noopener noreferrer" class="footer-server-link" id="footer-username-link">@byeu_u</a>
       <div class="social-links">
         <a href="https://instagram.com/byew_p" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
           <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
@@ -1296,11 +1434,11 @@
         </a>
       </div>
     </footer>
-
   </main>
 
   <script>
     const BADGE_CDN_BASE = "https://cdn.jsdelivr.net/gh/mezotv/discord-badges@main/assets";
+    const CDN = "https://cdn.discordapp.com";
 
     const DEFAULT_VINYL_SVG =
       "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='50%25' stop-color='%23d4d4d8'/%3E%3Cstop offset='100%25' stop-color='%2352525b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='300' height='300' fill='%23070709'/%3E%3Ccircle cx='150' cy='150' r='58' fill='none' stroke='%2327272a' stroke-width='6'/%3E%3Ccircle cx='150' cy='150' r='16' fill='url(%23g)'/%3E%3C/svg%3E";
@@ -1318,6 +1456,9 @@
       hypesquad_house_1: "hypesquadbravery.svg",
       hypesquad_house_2: "hypesquadbrilliance.svg",
       hypesquad_house_3: "hypesquadbalance.svg",
+      hypesquad_online_house_1: "hypesquadbravery.svg",
+      hypesquad_online_house_2: "hypesquadbrilliance.svg",
+      hypesquad_online_house_3: "hypesquadbalance.svg",
       bug_hunter_level_1: "discordbughunter1.svg",
       bug_hunter_level_2: "discordbughunter2.svg",
       verified_developer: "discordbotdev.svg",
@@ -1329,6 +1470,21 @@
       premium: "discordnitro.svg"
     };
 
+    const PUBLIC_FLAG_BADGES = [
+      [1 << 0,  { id: "staff", name: "Discord Staff", icon: "5e74e9b61934fc1f67c65515d1f7e60d" }],
+      [1 << 1,  { id: "partner", name: "Partnered Server Owner", icon: "3f9748e53446a137a052f3454e2de41e" }],
+      [1 << 2,  { id: "hypesquad", name: "HypeSquad Events", icon: "bf01d1073931f921909045f3a39fd264" }],
+      [1 << 3,  { id: "bug_hunter_level_1", name: "Discord Bug Hunter", icon: "2717692c7dca7289b35297368a940dd0" }],
+      [1 << 6,  { id: "hypesquad_online_house_1", name: "HypeSquad Bravery", icon: "8a88d63823d8a71cd5e390baa45efa02" }],
+      [1 << 7,  { id: "hypesquad_online_house_2", name: "HypeSquad Brilliance", icon: "011940fd013da3f7fb926e4a1cd2e618" }],
+      [1 << 8,  { id: "hypesquad_online_house_3", name: "HypeSquad Balance", icon: "3aa41de486fa12454c3761e8e223442e" }],
+      [1 << 9,  { id: "early_supporter", name: "Early Supporter", icon: "7060786766c9c840eb3019e725d2b358" }],
+      [1 << 14, { id: "bug_hunter_level_2", name: "Discord Bug Hunter (Gold)", icon: "848f79194d4be5ff5f81505cbd0ce1e6" }],
+      [1 << 17, { id: "verified_developer", name: "Early Verified Bot Developer", icon: "6df5892e0f35b051f8b61eace34f4967" }],
+      [1 << 18, { id: "certified_moderator", name: "Moderator Programs Alumni", icon: "fee1624003e2fee35cb398e125dc479b" }],
+      [1 << 22, { id: "active_developer", name: "Active Developer", icon: "6bdc42827a38498929a4920da12695d9" }]
+    ];
+
     const STATUS_SVGS = {
       online: '<svg viewBox="0 0 16 16"><defs><linearGradient id="stSilver" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffffff"/><stop offset="52%" stop-color="#d4d4d8"/><stop offset="100%" stop-color="#71717a"/></linearGradient></defs><circle cx="8" cy="8" r="8" fill="url(#stSilver)"/></svg>',
       idle: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#d97706"/></svg>',
@@ -1338,6 +1494,8 @@
 
     const APP_URL_MAP = [
       { match: ["zed"], url: "https://zed.dev" },
+      { match: ["helium"], url: "https://helium.computer" },
+      { match: ["mullvad"], url: "https://mullvad.net" },
       { match: ["lunar client", "lunarclient", "lunar"], url: "https://www.lunarclient.com" },
       { match: ["modrinth"], url: "https://modrinth.com" },
       { match: ["minecraft"], url: "https://www.minecraft.net" },
@@ -1381,14 +1539,94 @@
       cloudIcon: document.getElementById("cloud-proj-icon"),
       cloudName: document.getElementById("cloud-proj-name"),
       cloudDesc: document.getElementById("cloud-proj-desc"),
+      secondIcon: document.getElementById("second-proj-icon"),
+      secondName: document.getElementById("second-proj-name"),
+      secondDesc: document.getElementById("second-proj-desc"),
+      footerUsernameLink: document.getElementById("footer-username-link"),
       activityList: document.getElementById("activity-list"),
+      favContentList: document.getElementById("favorite-content-list"),
       lastfmGrid: document.getElementById("lastfm-grid"),
       lastfmStats: document.getElementById("lastfm-stats-label"),
       lyricsFloat: document.getElementById("lyrics-float"),
-      lyricsTrack: document.getElementById("lyrics-track")
+      lyricsTrack: document.getElementById("lyrics-track"),
+      mcStage: document.getElementById("mc-side-stage"),
+      rbxStage: document.getElementById("rbx-side-stage"),
+      mcCanvasWrap: document.getElementById("mc-canvas-wrap"),
+      rbxCanvasWrap: document.getElementById("rbx-canvas-wrap"),
+      mcCanvas: document.getElementById("mc-3d-canvas"),
+      rbxCanvas: document.getElementById("rbx-3d-canvas"),
+      mcTagLabel: document.getElementById("mc-tag-label"),
+      rbxTagLabel: document.getElementById("rbx-tag-label")
     };
 
-    /* Pre-decode image swaps so artwork never pops or flashes mid-frame */
+    /* Responsive placement for <900px viewports */
+    (function setupResponsive3DStages() {
+      let mobileRow = null;
+      function checkViewport() {
+        if (window.innerWidth <= 900) {
+          if (!mobileRow) {
+            mobileRow = document.createElement("div");
+            mobileRow.className = "mobile-3d-row";
+            document.body.insertBefore(mobileRow, document.querySelector(".page-wrap"));
+          }
+          if (DOM.mcStage.parentElement !== mobileRow) mobileRow.appendChild(DOM.mcStage);
+          if (DOM.rbxStage.parentElement !== mobileRow) mobileRow.appendChild(DOM.rbxStage);
+        } else if (mobileRow) {
+          document.body.insertBefore(DOM.mcStage, document.querySelector(".page-wrap"));
+          document.body.insertBefore(DOM.rbxStage, document.querySelector(".page-wrap"));
+          mobileRow.remove();
+          mobileRow = null;
+        }
+      }
+      checkViewport();
+      window.addEventListener("resize", checkViewport, { passive: true });
+    })();
+
+    /* Smooth-Cornered Square Favicon Generator */
+    function updateTabFavicon(avatarUrl) {
+      if (!avatarUrl) return;
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        try {
+          const size = 64;
+          const radius = 15;
+          const canvas = document.createElement("canvas");
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext("2d");
+          ctx.beginPath();
+          if (typeof ctx.roundRect === "function") {
+            ctx.roundRect(0, 0, size, size, radius);
+          } else {
+            ctx.moveTo(radius, 0);
+            ctx.lineTo(size - radius, 0);
+            ctx.quadraticCurveTo(size, 0, size, radius);
+            ctx.lineTo(size, size - radius);
+            ctx.quadraticCurveTo(size, size, size - radius, size);
+            ctx.lineTo(radius, size);
+            ctx.quadraticCurveTo(0, size, 0, size - radius);
+            ctx.lineTo(0, radius);
+            ctx.quadraticCurveTo(0, 0, radius, 0);
+          }
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(img, 0, 0, size, size);
+          const dataUrl = canvas.toDataURL("image/png");
+          let link = document.getElementById("dynamic-favicon");
+          if (!link) {
+            link = document.createElement("link");
+            link.id = "dynamic-favicon";
+            link.rel = "icon";
+            document.head.appendChild(link);
+          }
+          link.type = "image/png";
+          link.href = dataUrl;
+        } catch {}
+      };
+      img.src = avatarUrl;
+    }
+
     function swapImageSmooth(imgEl, targetUrl, fallbackUrl = null) {
       if (!imgEl || !targetUrl) return;
       if (imgEl.getAttribute("src") === targetUrl) return;
@@ -1422,7 +1660,6 @@
     }
     window.addEventListener("resize", syncHandleCopyWidths, { passive: true });
 
-    /* Multi-format Background Image & Video Resolver */
     (function initBackgroundMedia() {
       const wrap = document.getElementById("bg-media-wrap");
       const imgEl = document.getElementById("bg-image");
@@ -1520,6 +1757,11 @@
     let lastDstnSig = "";
     let copyTimer = null;
 
+    const badgeState = {
+      api: [],
+      flags: []
+    };
+
     function copyTextToClipboard(text) {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         return navigator.clipboard.writeText(text).catch(() => fallbackCopyText(text));
@@ -1555,61 +1797,105 @@
       });
     });
 
-    function resolveBadgeAssets(b) {
+    function resolveBadgeAssets(b, size = 256) {
       const id = String(b.id || "").toLowerCase();
-      const rawIcon = b.icon || b.asset || "";
+      const rawIcon = String(b.icon || b.asset || "").replace(/\.png$/i, "");
       let dcdnUrl = b.icon_url || b.iconUrl || "";
       if (!dcdnUrl && rawIcon) {
-        dcdnUrl = rawIcon.startsWith("http") ? rawIcon : `https://cdn.discordapp.com/badge-icons/${rawIcon}.png`;
+        dcdnUrl = /^https?:\/\//i.test(rawIcon)
+          ? rawIcon
+          : `${CDN}/badge-icons/${rawIcon}.png?size=${size}`;
       }
       const svgFallback = DISCORD_SVG_BADGE_MAP[id] ? `${BADGE_CDN_BASE}/${DISCORD_SVG_BADGE_MAP[id]}` : null;
-      return { primaryUrl: dcdnUrl || svgFallback, fallbackUrl: dcdnUrl && svgFallback ? svgFallback : null };
+      return {
+        primaryUrl: dcdnUrl || svgFallback,
+        fallbackUrl: dcdnUrl && svgFallback ? svgFallback : null,
+        cleanHash: rawIcon
+      };
     }
 
-    function renderDiscordBadges(badgesArray) {
-      if (!DOM.discordBadges || !Array.isArray(badgesArray)) return;
+    function decodeFlagBadges(user) {
+      const flags = Number((user && (user.public_flags ?? user.flags)) || 0);
+      if (!flags) return [];
+      const list = [];
+      for (const [bit, b] of PUBLIC_FLAG_BADGES) {
+        if ((flags & bit) === bit) list.push({ ...b });
+      }
+      return list;
+    }
 
+    function rebuildAndRenderBadges() {
+      if (!DOM.discordBadges) return;
+      const combined = [...badgeState.api, ...badgeState.flags];
       const seen = new Set();
-      const normalized = [];
+      const deduped = [];
 
-      for (let i = 0; i < badgesArray.length; i++) {
-        const b = badgesArray[i];
+      for (let i = 0; i < combined.length; i++) {
+        const b = combined[i];
         if (!b || b.hidden === true || b.visible === false) continue;
-        const id = b.id || b.icon || b.description;
-        if (!id || seen.has(id)) continue;
-        const { primaryUrl, fallbackUrl } = resolveBadgeAssets(b);
+        const { primaryUrl, fallbackUrl, cleanHash } = resolveBadgeAssets(b, 256);
         if (!primaryUrl) continue;
-        seen.add(id);
-        normalized.push({ id, iconUrl: primaryUrl, fallbackUrl });
+        let normKey = String(b.id || b.icon || b.description || "").toLowerCase();
+        if (/^premium|^nitro/i.test(normKey)) normKey = "nitro";
+        else if (/^guild_booster|^boost/i.test(normKey)) normKey = "boost";
+        else if (/^hypesquad$|^hypesquad_events$/i.test(normKey)) normKey = "hypesquad_events";
+        if (!normKey || seen.has(normKey)) continue;
+        seen.add(normKey);
+        deduped.push({
+          id: b.id || cleanHash,
+          label: b.description || b.name || b.id || "Badge",
+          icon: primaryUrl,
+          fallbackIcon: fallbackUrl
+        });
       }
 
-      const sig = normalized.map(b => `${b.id}:${b.iconUrl}`).join("|");
+      const sig = deduped.map(b => `${b.id}:${b.icon}`).join("|");
       if (sig === lastBadgesSig) return;
       lastBadgesSig = sig;
 
       const frag = document.createDocumentFragment();
-      for (let i = 0; i < normalized.length; i++) {
-        const b = normalized[i];
+      for (let i = 0; i < deduped.length; i++) {
+        const b = deduped[i];
+        const span = document.createElement("span");
+        span.className = "discord-badge-item";
+        span.title = b.label;
+
         const img = document.createElement("img");
         img.className = "discord-badge-icon";
-        img.src = b.iconUrl;
-        img.alt = "";
+        img.src = b.icon;
+        img.alt = b.label;
         img.decoding = "async";
         img.onerror = () => {
-          if (b.fallbackUrl && img.src !== b.fallbackUrl) img.src = b.fallbackUrl;
-          else img.remove();
+          if (b.fallbackIcon && img.src !== b.fallbackIcon) img.src = b.fallbackIcon;
+          else span.remove();
         };
-        frag.appendChild(img);
+
+        span.appendChild(img);
+        frag.appendChild(span);
       }
       DOM.discordBadges.replaceChildren(frag);
+    }
+
+    function renderDiscordBadges(badgesArray) {
+      if (!Array.isArray(badgesArray)) return;
+      badgeState.api = badgesArray.map(b => ({
+        id: b.id,
+        name: b.description || b.name || b.id,
+        description: b.description || b.name || b.id,
+        icon: b.icon,
+        icon_url: b.icon_url || b.iconUrl || null,
+        hidden: b.hidden,
+        visible: b.visible
+      }));
+      rebuildAndRenderBadges();
     }
 
     function updateClanTag(clanObj) {
       if (clanObj && clanObj.tag && clanObj.identity_enabled !== false) {
         if (DOM.clanTagText.textContent !== clanObj.tag) DOM.clanTagText.textContent = clanObj.tag;
         if (clanObj.identity_guild_id && clanObj.badge) {
-          const url = `https://cdn.discordapp.com/clan-badges/${clanObj.identity_guild_id}/${clanObj.badge}.png?size=32`;
-          if (DOM.clanTagIcon.src !== url) DOM.clanTagIcon.src = url;
+          const badgeUrl = `${CDN}/clan-badges/${clanObj.identity_guild_id}/${clanObj.badge}.png?size=32`;
+          if (DOM.clanTagIcon.src !== badgeUrl) DOM.clanTagIcon.src = badgeUrl;
           DOM.clanTagIcon.style.display = "block";
           DOM.clanTagIcon.onerror = () => { DOM.clanTagIcon.style.display = "none"; };
         } else {
@@ -1647,8 +1933,14 @@
 
     function updateUserHeader(user, fullProfileData = null) {
       if (!user) return;
-      const rawName = (user.global_name || user.display_name || user.username || "zack").trim();
 
+      const flags = decodeFlagBadges(user);
+      if (flags.length) {
+        badgeState.flags = flags;
+        rebuildAndRenderBadges();
+      }
+
+      const rawName = (user.global_name || user.display_name || user.username || "zack").trim();
       if (DOM.username.textContent !== rawName) {
         DOM.username.textContent = rawName;
       }
@@ -1664,15 +1956,24 @@
         }
       }
 
+      const uid = user.id || DISCORD_ID;
+      if (DOM.footerUsernameLink) {
+        DOM.footerUsernameLink.href = `https://discord.com/users/${uid}`;
+      }
+
       if (user.username) {
         currentDiscordUsername = user.username;
         if (DOM.handleName.textContent !== user.username) {
           DOM.handleName.textContent = user.username;
           syncHandleCopyWidths();
         }
+        const displayName = user.global_name || user.display_name || user.username || "byeu_u";
+        const footerTag = `@${displayName}`;
+        if (DOM.footerUsernameLink && DOM.footerUsernameLink.textContent !== footerTag) {
+          DOM.footerUsernameLink.textContent = footerTag;
+        }
       }
 
-      const uid = user.id || DISCORD_ID;
       let defaultAvatarIdx = 0;
       try {
         const disc = String(user.discriminator || "0");
@@ -1687,6 +1988,7 @@
         : (user.avatar_url || user.default_avatar_url || fallbackAvatar);
 
       swapImageSmooth(DOM.avatar, avatarSrc, fallbackAvatar);
+      updateTabFavicon(avatarSrc);
 
       const asset = user.avatar_decoration_data?.asset;
       if (asset) {
@@ -1721,7 +2023,8 @@
       const bio = user.bio ?? data.user_profile?.bio ?? "";
       const badges = [
         ...(Array.isArray(data.badges) ? data.badges : []),
-        ...(Array.isArray(data.user_profile?.badges) ? data.user_profile.badges : [])
+        ...(Array.isArray(data.user_profile?.badges) ? data.user_profile.badges : []),
+        ...(Array.isArray(data.guild_badges) ? data.guild_badges : [])
       ];
       const sig = `${user.username}:${user.global_name}:${user.avatar}:${user.avatar_decoration_data?.asset}:${user.clan?.tag || ""}:${bio}:${badges.map(b => b.icon || b.id).join(",")}`;
       if (sig === lastDstnSig) return;
@@ -1746,7 +2049,448 @@
     }
 
     /* ====================================================
-       RECENT PLAYS, LUMINANCE & VERIFIED MULTI-LANGUAGE LYRICS
+       3D MINECRAFT (LEFT) & ROBLOX (RIGHT) ENGINES
+       ==================================================== */
+    function initMinecraft3DViewer() {
+      if (!DOM.mcCanvas || !DOM.mcCanvasWrap) return;
+      if (typeof window.skinview3d === "undefined") {
+        setTimeout(initMinecraft3DViewer, 80);
+        return;
+      }
+
+      const rect = DOM.mcCanvasWrap.getBoundingClientRect();
+      const w = Math.max(200, Math.round(rect.width || 280));
+      const h = Math.max(320, Math.round(rect.height || 440));
+
+      const viewer = new skinview3d.SkinViewer({
+        canvas: DOM.mcCanvas,
+        width: w,
+        height: h,
+        skin: `https://mc-heads.net/skin/${MINECRAFT_UUID}`
+      });
+
+      viewer.fov = 38;
+      viewer.zoom = 0.86;
+      viewer.autoRotate = true;
+      viewer.autoRotateSpeed = 1.15; // Spins Clockwise
+      viewer.animation = new skinview3d.IdleAnimation();
+
+      if (viewer.controls) {
+        viewer.controls.enableZoom = false;
+        viewer.controls.enablePan = false;
+      }
+
+      // Resolve exact Mojang profile username, slim/classic model & fallback skins
+      fetchJson(`https://api.ashcon.app/mojang/v2/user/${MINECRAFT_UUID}`, false, 4500).then(profile => {
+        if (profile) {
+          if (profile.username && DOM.mcTagLabel) {
+            DOM.mcTagLabel.textContent = profile.username;
+          }
+          const rawSkinUrl = profile.textures?.skin?.url;
+          const isSlim = profile.textures?.slim === true;
+          if (rawSkinUrl) {
+            viewer.loadSkin(rawSkinUrl, { model: isSlim ? "slim" : "default" }).catch(() => {});
+          }
+          const rawCapeUrl = profile.textures?.cape?.url;
+          if (rawCapeUrl) {
+            viewer.loadCape(rawCapeUrl).catch(() => {});
+          }
+        }
+      });
+
+      let resizeTimer = null;
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          const r = DOM.mcCanvasWrap.getBoundingClientRect();
+          if (r.width > 0 && r.height > 0) {
+            viewer.setSize(Math.round(r.width), Math.round(r.height));
+          }
+        }, 100);
+      }, { passive: true });
+    }
+
+    function getRbxCdnUrl(hash) {
+      const clean = String(hash || "").trim();
+      let i = 31;
+      for (let t = 0; t < clean.length; t++) {
+        i ^= clean.charCodeAt(t);
+      }
+      return `https://t${i % 8}.rbxcdn.com/${clean}`;
+    }
+
+    async function fetchWithCorsFallback(targetUrl, asText = false) {
+      const candidates = [
+        targetUrl.replace("https://thumbnails.roblox.com/", "https://thumbnails.roproxy.com/")
+                 .replace("https://users.roblox.com/", "https://users.roproxy.com/"),
+        `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`
+      ];
+
+      for (let i = 0; i < candidates.length; i++) {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 4500);
+        try {
+          const res = await fetch(candidates[i], { signal: ctrl.signal });
+          clearTimeout(timer);
+          if (res.ok) {
+            return asText ? await res.text() : await res.json();
+          }
+        } catch {
+          clearTimeout(timer);
+        }
+      }
+      return null;
+    }
+
+    function parseRobloxMtlAndObj(mtlText, objText, THREE) {
+      const materials = {};
+      let currentMtl = null;
+      const texLoader = new THREE.TextureLoader();
+      texLoader.setCrossOrigin("anonymous");
+
+      const mtlLines = String(mtlText || "").split(/\r?\n/);
+      for (let i = 0; i < mtlLines.length; i++) {
+        const line = mtlLines[i].trim();
+        if (!line || line.startsWith("#")) continue;
+        const parts = line.split(/\s+/);
+        const cmd = parts[0];
+        if (cmd === "newmtl") {
+          currentMtl = parts[1];
+          materials[currentMtl] = { color: new THREE.Color(0xd4d4d8), mapUrl: null };
+        } else if (cmd === "Kd" && currentMtl && parts.length >= 4) {
+          materials[currentMtl].color.setRGB(
+            parseFloat(parts[1]) || 0.8,
+            parseFloat(parts[2]) || 0.8,
+            parseFloat(parts[3]) || 0.8
+          );
+        } else if (cmd === "map_Kd" && currentMtl && parts[1]) {
+          const texRef = parts[parts.length - 1];
+          materials[currentMtl].mapUrl = /^https?:\/\//i.test(texRef) ? texRef : getRbxCdnUrl(texRef);
+        }
+      }
+
+      const v = [];
+      const vt = [];
+      const vn = [];
+      const groups = {};
+      let activeMtl = "default";
+
+      const objLines = String(objText || "").split(/\r?\n/);
+      for (let i = 0; i < objLines.length; i++) {
+        const line = objLines[i].trim();
+        if (!line || line.startsWith("#")) continue;
+        const parts = line.split(/\s+/);
+        const cmd = parts[0];
+
+        if (cmd === "v") {
+          v.push([parseFloat(parts[1]) || 0, parseFloat(parts[2]) || 0, parseFloat(parts[3]) || 0]);
+        } else if (cmd === "vt") {
+          vt.push([parseFloat(parts[1]) || 0, parseFloat(parts[2]) || 0]);
+        } else if (cmd === "vn") {
+          vn.push([parseFloat(parts[1]) || 0, parseFloat(parts[2]) || 0, parseFloat(parts[3]) || 0]);
+        } else if (cmd === "usemtl") {
+          activeMtl = parts[1] || "default";
+        } else if (cmd === "f") {
+          if (!groups[activeMtl]) {
+            groups[activeMtl] = { pos: [], uv: [], norm: [] };
+          }
+          const grp = groups[activeMtl];
+          const verts = parts.slice(1).map(tok => tok.split("/").map(n => parseInt(n, 10)));
+          for (let j = 1; j < verts.length - 1; j++) {
+            const tri = [verts[0], verts[j], verts[j + 1]];
+            for (let k = 0; k < 3; k++) {
+              const [vi, ti, ni] = tri[k];
+              const p = v[(vi > 0 ? vi - 1 : v.length + vi)] || [0, 0, 0];
+              const t = vt[(ti > 0 ? ti - 1 : vt.length + ti)] || [0, 0];
+              const n = vn[(ni > 0 ? ni - 1 : vn.length + ni)] || [0, 1, 0];
+              grp.pos.push(p[0], p[1], p[2]);
+              grp.uv.push(t[0], t[1]);
+              grp.norm.push(n[0], n[1], n[2]);
+            }
+          }
+        }
+      }
+
+      const root = new THREE.Group();
+      for (const [mtlName, grp] of Object.entries(groups)) {
+        if (grp.pos.length === 0) continue;
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute("position", new THREE.Float32BufferAttribute(grp.pos, 3));
+        if (grp.uv.length > 0) geo.setAttribute("uv", new THREE.Float32BufferAttribute(grp.uv, 2));
+        if (grp.norm.length > 0) {
+          geo.setAttribute("normal", new THREE.Float32BufferAttribute(grp.norm, 3));
+        } else {
+          geo.computeVertexNormals();
+        }
+
+        const mInfo = materials[mtlName] || { color: new THREE.Color(0xd4d4d8), mapUrl: null };
+        const mat = new THREE.MeshStandardMaterial({
+          color: mInfo.mapUrl ? 0xffffff : mInfo.color,
+          roughness: 0.58,
+          metalness: 0.08,
+          side: THREE.DoubleSide
+        });
+
+        if (mInfo.mapUrl) {
+          texLoader.load(mInfo.mapUrl, tex => {
+            mat.map = tex;
+            mat.needsUpdate = true;
+          });
+        }
+
+        root.add(new THREE.Mesh(geo, mat));
+      }
+
+      const box = new THREE.Box3().setFromObject(root);
+      const size = new THREE.Vector3();
+      const center = new THREE.Vector3();
+      box.getSize(size);
+      box.getCenter(center);
+
+      const maxDim = Math.max(size.x, size.y, size.z, 0.001);
+      const scale = 3.6 / maxDim;
+      root.scale.setScalar(scale);
+      root.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+
+      const wrapper = new THREE.Group();
+      wrapper.add(root);
+      return wrapper;
+    }
+
+    function createRobloxR6FallbackRig(THREE) {
+      const rig = new THREE.Group();
+      const matHead = new THREE.MeshStandardMaterial({ color: 0xf4f4f5, roughness: 0.45, metalness: 0.1 });
+      const matTorso = new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.55, metalness: 0.15 });
+      const matLimb = new THREE.MeshStandardMaterial({ color: 0xd4d4d8, roughness: 0.5, metalness: 0.1 });
+      const matLegs = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.6, metalness: 0.1 });
+
+      const head = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.46, 0.88, 24), matHead);
+      head.position.y = 1.28;
+      rig.add(head);
+
+      const torso = new THREE.Mesh(new THREE.BoxGeometry(1.52, 1.52, 0.76), matTorso);
+      torso.position.y = 0.05;
+      rig.add(torso);
+
+      const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.72, 1.52, 0.74), matLimb);
+      leftArm.position.set(-1.16, 0.05, 0);
+      rig.add(leftArm);
+
+      const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.72, 1.52, 0.74), matLimb);
+      rightArm.position.set(1.16, 0.05, 0);
+      rig.add(rightArm);
+
+      const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.73, 1.52, 0.74), matLegs);
+      leftLeg.position.set(-0.39, -1.48, 0);
+      rig.add(leftLeg);
+
+      const rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.73, 1.52, 0.74), matLegs);
+      rightLeg.position.set(0.39, -1.48, 0);
+      rig.add(rightLeg);
+
+      rig.userData.isRig = true;
+      rig.userData.parts = { leftArm, rightArm, leftLeg, rightLeg, head };
+      return rig;
+    }
+
+    function createVolumetricAvatarMesh(texture, THREE) {
+      const group = new THREE.Group();
+      const slices = 18;
+      const depth = 0.22;
+      const planeGeo = new THREE.PlaneGeometry(3.4, 3.4);
+
+      for (let i = 0; i < slices; i++) {
+        const z = ((i / (slices - 1)) - 0.5) * depth;
+        const isEdge = i === 0 || i === slices - 1;
+        const mat = new THREE.MeshStandardMaterial({
+          map: texture,
+          transparent: true,
+          alphaTest: 0.08,
+          roughness: 0.45,
+          metalness: 0.06,
+          color: isEdge ? 0xffffff : 0xd4d4d8,
+          side: THREE.DoubleSide
+        });
+        const slice = new THREE.Mesh(planeGeo, mat);
+        slice.position.z = z;
+        group.add(slice);
+      }
+      return group;
+    }
+
+    function initRoblox3DViewer() {
+      if (!DOM.rbxCanvas || !DOM.rbxCanvasWrap) return;
+      if (typeof window.THREE === "undefined") {
+        setTimeout(initRoblox3DViewer, 80);
+        return;
+      }
+
+      const THREE = window.THREE;
+      const rect = DOM.rbxCanvasWrap.getBoundingClientRect();
+      const w = Math.max(200, Math.round(rect.width || 280));
+      const h = Math.max(320, Math.round(rect.height || 440));
+
+      const renderer = new THREE.WebGLRenderer({
+        canvas: DOM.rbxCanvas,
+        alpha: true,
+        antialias: true,
+        powerPreference: "high-performance"
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(w, h, false);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(38, w / h, 0.1, 100);
+      camera.position.set(0, 0.15, 6.2);
+
+      scene.add(new THREE.AmbientLight(0xffffff, 0.78));
+      const keyLight = new THREE.DirectionalLight(0xffffff, 0.88);
+      keyLight.position.set(3, 5, 6);
+      scene.add(keyLight);
+      const rimLight = new THREE.DirectionalLight(0xd4d4d8, 0.45);
+      rimLight.position.set(-4, 2, -5);
+      scene.add(rimLight);
+
+      const pivot = new THREE.Group();
+      scene.add(pivot);
+
+      // Start immediately with the articulated 3D R6 rig so the stage is never empty
+      const fallbackRig = createRobloxR6FallbackRig(THREE);
+      pivot.add(fallbackRig);
+
+      function replacePivotModel(newObj) {
+        while (pivot.children.length > 0) {
+          pivot.remove(pivot.children[0]);
+        }
+        pivot.add(newObj);
+      }
+
+      // Interactive horizontal drag rotation
+      let isDragging = false;
+      let prevX = 0;
+      DOM.rbxCanvasWrap.addEventListener("pointerdown", e => {
+        isDragging = true;
+        prevX = e.clientX;
+      });
+      window.addEventListener("pointermove", e => {
+        if (!isDragging) return;
+        const dx = e.clientX - prevX;
+        prevX = e.clientX;
+        pivot.rotation.y += dx * 0.012;
+      }, { passive: true });
+      window.addEventListener("pointerup", () => { isDragging = false; }, { passive: true });
+
+      // Fetch Roblox username for label
+      fetchWithCorsFallback(`https://users.roblox.com/v1/users/${ROBLOX_USER_ID}`, false).then(u => {
+        const label = u?.displayName || u?.name;
+        if (label && DOM.rbxTagLabel) {
+          DOM.rbxTagLabel.textContent = label;
+        }
+      });
+
+      // Attempt 1: Load true 3D OBJ + MTL from Roblox avatar-3d API
+      // Attempt 2: Load live 720x720 full-body avatar texture as volumetric 3D model
+      (async function loadRobloxAvatarAssets() {
+        let loadedTrue3D = false;
+        const meta3d = await fetchWithCorsFallback(
+          `https://thumbnails.roblox.com/v1/users/avatar-3d?userId=${ROBLOX_USER_ID}`,
+          false
+        );
+
+        if (meta3d && meta3d.state === "Completed" && meta3d.imageUrl) {
+          try {
+            const manifest = await fetchJson(meta3d.imageUrl, false, 4500);
+            if (manifest && manifest.obj && manifest.mtl) {
+              const objUrl = /^https?:\/\//i.test(manifest.obj) ? manifest.obj : getRbxCdnUrl(manifest.obj);
+              const mtlUrl = /^https?:\/\//i.test(manifest.mtl) ? manifest.mtl : getRbxCdnUrl(manifest.mtl);
+              const [mtlText, objText] = await Promise.all([
+                fetch(mtlUrl).then(r => (r.ok ? r.text() : "")),
+                fetch(objUrl).then(r => (r.ok ? r.text() : ""))
+              ]);
+              if (objText && objText.includes("v ")) {
+                const mesh3d = parseRobloxMtlAndObj(mtlText, objText, THREE);
+                replacePivotModel(mesh3d);
+                loadedTrue3D = true;
+              }
+            }
+          } catch {}
+        }
+
+        if (!loadedTrue3D) {
+          const thumbData = await fetchWithCorsFallback(
+            `https://thumbnails.roblox.com/v1/users/avatar?userIds=${ROBLOX_USER_ID}&size=720x720&format=Png&isCircular=false`,
+            false
+          );
+          const imgUrl = thumbData?.data?.[0]?.imageUrl;
+          if (imgUrl) {
+            const texLoader = new THREE.TextureLoader();
+            texLoader.setCrossOrigin("anonymous");
+            const tryUrls = [
+              imgUrl,
+              `https://corsproxy.io/?${encodeURIComponent(imgUrl)}`,
+              `https://api.allorigins.win/raw?url=${encodeURIComponent(imgUrl)}`
+            ];
+            let idx = 0;
+            const loadNextTex = () => {
+              if (idx >= tryUrls.length) return;
+              texLoader.load(
+                tryUrls[idx++],
+                tex => {
+                  replacePivotModel(createVolumetricAvatarMesh(tex, THREE));
+                },
+                undefined,
+                loadNextTex
+              );
+            };
+            loadNextTex();
+          }
+        }
+      })();
+
+      let lastTime = performance.now();
+      function animateRoblox(now) {
+        requestAnimationFrame(animateRoblox);
+        if (document.hidden) return;
+        const dt = Math.min(0.05, (now - lastTime) / 1000);
+        lastTime = now;
+
+        if (!isDragging) {
+          // Spins Counter-Clockwise (opposite of Minecraft's clockwise spin)
+          pivot.rotation.y -= dt * 1.15;
+        }
+        pivot.position.y = Math.sin(now * 0.002) * 0.08;
+
+        const child = pivot.children[0];
+        if (child?.userData?.isRig) {
+          const { leftArm, rightArm, leftLeg, rightLeg } = child.userData.parts;
+          const swing = Math.sin(now * 0.0024) * 0.14;
+          leftArm.rotation.x = swing;
+          rightArm.rotation.x = -swing;
+          leftLeg.rotation.x = -swing * 0.6;
+          rightLeg.rotation.x = swing * 0.6;
+        }
+
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(animateRoblox);
+
+      let resizeTimer = null;
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          const r = DOM.rbxCanvasWrap.getBoundingClientRect();
+          if (r.width > 0 && r.height > 0) {
+            camera.aspect = r.width / r.height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(Math.round(r.width), Math.round(r.height), false);
+          }
+        }, 100);
+      }, { passive: true });
+    }
+
+    /* ====================================================
+       ARTWORK, YOUTUBE CHANNELS, LYRICS & PLAYS ENGINE
        ==================================================== */
     const rawArtworks = stateCache.artworks || {};
     const artworkCache = new Map(
@@ -1796,7 +2540,7 @@
                 coverLuminanceCache.delete(coverLuminanceCache.keys().next().value);
               }
               saveCache({ lum: Object.fromEntries(coverLuminanceCache) });
-              if (card.dataset.artUrl === imgUrl) {
+              if (!card.dataset.artUrl || card.dataset.artUrl === imgUrl) {
                 card.classList.toggle("light-bg", Boolean(isLight));
               }
             } catch {
@@ -1812,6 +2556,108 @@
       });
     }
 
+    function formatCompactCount(num) {
+      const n = Number(num);
+      if (!Number.isFinite(n) || n <= 0) return null;
+      if (n >= 1e9) return `${+(n / 1e9).toFixed(2)}B`;
+      if (n >= 1e6) return `${+(n / 1e6).toFixed(n >= 10e6 ? 1 : 2)}M`;
+      if (n >= 1e3) return `${+(n / 1e3).toFixed(1)}K`;
+      return n.toLocaleString();
+    }
+
+    async function initFavoriteYouTubeChannels() {
+      if (!DOM.favContentList) return;
+      const cards = Array.from(DOM.favContentList.querySelectorAll("[data-yt-id]"));
+      const ytCache = { ...(stateCache.yt || {}) };
+
+      cards.forEach(card => {
+        const channelId = card.dataset.ytId;
+        const handle = card.dataset.ytHandle;
+        const fallbackPfp = `https://unavatar.io/youtube/${handle}`;
+        const bgImg = card.querySelector(".yt-pfp-bg");
+        const thumbImg = card.querySelector(".yt-pfp-thumb");
+        const statsEl = card.querySelector(".yt-stats");
+
+        if (bgImg) bgImg.onerror = () => { bgImg.src = DEFAULT_VINYL_SVG; };
+        if (thumbImg) thumbImg.onerror = () => { thumbImg.src = DEFAULT_VINYL_SVG; };
+
+        const cached = ytCache[channelId];
+        if (cached) {
+          if (cached.stats && statsEl) statsEl.textContent = cached.stats;
+          if (cached.pfp) {
+            card.dataset.artUrl = cached.pfp;
+            swapImageSmooth(bgImg, cached.pfp, fallbackPfp);
+            swapImageSmooth(thumbImg, cached.pfp, fallbackPfp);
+            applyCardCoverLuminance(card, cached.pfp);
+          }
+        } else {
+          card.dataset.artUrl = fallbackPfp;
+          applyCardCoverLuminance(card, fallbackPfp);
+        }
+      });
+
+      let cacheUpdated = false;
+      await Promise.allSettled(
+        cards.map(async card => {
+          const channelId = card.dataset.ytId;
+          const handle = card.dataset.ytHandle;
+          if (!channelId) return;
+
+          const data = await fetchJson(
+            `https://mixerno.space/api/youtube-channel-counter/user/${encodeURIComponent(channelId)}`,
+            false,
+            4500
+          );
+          if (!data) return;
+
+          const counts = Array.isArray(data.counts) ? data.counts : [];
+          const userArr = Array.isArray(data.user) ? data.user : [];
+          const findMetric = (arr, key) =>
+            arr.find(item => String(item?.value || "").toLowerCase() === key)?.count;
+
+          const rawSubs = findMetric(counts, "subscribers") ?? findMetric(counts, "api subscribers");
+          const rawVideos = findMetric(counts, "videos");
+          const pfpUrl = findMetric(userArr, "pfp");
+
+          const bgImg = card.querySelector(".yt-pfp-bg");
+          const thumbImg = card.querySelector(".yt-pfp-thumb");
+          const statsEl = card.querySelector(".yt-stats");
+          const fallbackPfp = `https://unavatar.io/youtube/${handle}`;
+
+          let finalPfp = ytCache[channelId]?.pfp || "";
+          if (typeof pfpUrl === "string" && pfpUrl.startsWith("http")) {
+            finalPfp = pfpUrl;
+            card.dataset.artUrl = pfpUrl;
+            swapImageSmooth(bgImg, pfpUrl, fallbackPfp);
+            swapImageSmooth(thumbImg, pfpUrl, fallbackPfp);
+            applyCardCoverLuminance(card, pfpUrl);
+          }
+
+          const subsFormatted = formatCompactCount(rawSubs);
+          const videosFormatted = Number(rawVideos) > 0 ? Number(rawVideos).toLocaleString() : null;
+          let finalStats = statsEl ? statsEl.textContent : "";
+
+          if (subsFormatted && videosFormatted) {
+            finalStats = `${subsFormatted} subscribers · ${videosFormatted} videos`;
+          } else if (subsFormatted) {
+            const fallbackVids = finalStats.split("·")[1]?.trim() || "";
+            finalStats = fallbackVids
+              ? `${subsFormatted} subscribers · ${fallbackVids}`
+              : `${subsFormatted} subscribers`;
+          }
+
+          if (statsEl && finalStats && statsEl.textContent !== finalStats) {
+            statsEl.textContent = finalStats;
+          }
+
+          ytCache[channelId] = { pfp: finalPfp, stats: finalStats };
+          cacheUpdated = true;
+        })
+      );
+
+      if (cacheUpdated) saveCache({ yt: ytCache });
+    }
+
     let recentDiscordHistory = Array.isArray(stateCache.discordHistory) ? stateCache.discordHistory : [];
     let activeSpotifyTrack = null;
     let activeSpotifyKey = "";
@@ -1823,14 +2669,12 @@
     let lastFmTotal = stateCache.totalScrobbles || null;
     let lastTracksSig = "";
 
-    /* Floating Smooth Lyrics State */
     const lyricsCache = new Map();
     let activeLyricsData = null;
     let activeLyricsTrackKey = "";
     let isHoveringNowPlaying = false;
     let lastActiveLyricIdx = -999;
 
-    /* Accent-insensitive & French-aware normalization for matching */
     function normalizeStr(str) {
       const raw = String(str || "");
       if (!raw) return "";
@@ -1854,7 +2698,6 @@
       return val;
     }
 
-    /* Clean query string while keeping UTF-8 accents & French apostrophes intact */
     function cleanQueryPreserveAccents(str) {
       return String(str || "")
         .replace(/[\u2018\u2019\u02BC]/g, "'")
@@ -1935,7 +2778,6 @@
       return parsed;
     }
 
-    /* Strictly verify that an LRCLIB entry matches both the artist and track (and duration if known) */
     function isVerifiedLyricMatch(candidate, targetArtistRaw, targetTrackRaw, targetDurationSec) {
       if (!candidate || !candidate.syncedLyrics) return false;
 
@@ -2200,6 +3042,8 @@
       }
       const lower = (act.name || "").toLowerCase();
       if (lower.includes("zed")) return "https://www.google.com/s2/favicons?domain=zed.dev&sz=64";
+      if (lower.includes("helium")) return "https://www.google.com/s2/favicons?domain=helium.computer&sz=64";
+      if (lower.includes("mullvad")) return "https://www.google.com/s2/favicons?domain=mullvad.net&sz=64";
       if (lower.includes("code")) return "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=64";
       if (lower.includes("roblox") || lower.includes("sober")) return "https://www.google.com/s2/favicons?domain=roblox.com&sz=64";
       if (lower.includes("modrinth")) return "https://www.google.com/s2/favicons?domain=modrinth.com&sz=64";
@@ -2283,7 +3127,7 @@
           song: musicAct.details,
           artist: artist || "Unknown Artist",
           art,
-          url: resolveActivityUrl(musicAct) || `https://open.spotify.com/search/${encodeURIComponent(musicAct.details)}`,
+          url: resolveActivityUrl(musicAct) || `https://www.google.com/search?q=${encodeURIComponent(musicAct.details)}`,
           timestamps: musicAct.timestamps || null,
           trackId: musicAct.sync_id || `${musicAct.details}:${artist}`,
           app: detectedApp
@@ -2588,7 +3432,20 @@
       if (DOM.cloudDesc.textContent !== desc) DOM.cloudDesc.textContent = desc;
     }
 
-    /* Concurrent Abortable Artwork Resolver (iTunes + Last.fm) */
+    function applySecondServer(guild, online, members) {
+      if (!guild) return;
+      if (guild.name && DOM.secondName.textContent !== guild.name) DOM.secondName.textContent = guild.name;
+      if (guild.icon) {
+        const ext = guild.icon.startsWith("a_") ? "gif" : "png";
+        const url = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.${ext}?size=128`;
+        swapImageSmooth(DOM.secondIcon, url);
+      }
+      const desc = guild.description
+        ? `${guild.description} (${Number(members || 0).toLocaleString()} members)`
+        : `${Number(online || 0).toLocaleString()} online · ${Number(members || 0).toLocaleString()} members`;
+      if (DOM.secondDesc.textContent !== desc) DOM.secondDesc.textContent = desc;
+    }
+
     function fetchTrackCoverUrl(artistRaw, trackRaw) {
       const cached = getCachedTrackArt(artistRaw, trackRaw);
       if (cached) return Promise.resolve(cached);
@@ -2981,6 +3838,9 @@
 
     (async function init() {
       syncHandleCopyWidths();
+      initFavoriteYouTubeChannels();
+      initMinecraft3DViewer();
+      initRoblox3DViewer();
 
       const hasCachedState = Boolean(stateCache.dstnUser || stateCache.presence);
       if (stateCache.dstnUser) updateUserHeader(stateCache.dstnUser, stateCache.dstnFull);
@@ -2989,6 +3849,7 @@
       if (stateCache.presence) applyPresenceData(stateCache.presence);
       else renderActivityFeed([]);
       if (stateCache.cloud) applyCloudServer(stateCache.cloud.guild, stateCache.cloud.online, stateCache.cloud.members);
+      if (stateCache.secondCloud) applySecondServer(stateCache.secondCloud.guild, stateCache.secondCloud.online, stateCache.secondCloud.members);
       if (lastFmTracks.length > 0) syncLiveAndRenderTracks();
 
       if (hasCachedState) revealSite();
@@ -3000,6 +3861,12 @@
         if (d?.guild) {
           applyCloudServer(d.guild, d.approximate_presence_count, d.approximate_member_count);
           saveCache({ cloud: { guild: d.guild, online: d.approximate_presence_count, members: d.approximate_member_count } });
+        }
+      });
+      EARLY.invite2.then(d => {
+        if (d?.guild) {
+          applySecondServer(d.guild, d.approximate_presence_count, d.approximate_member_count);
+          saveCache({ secondCloud: { guild: d.guild, online: d.approximate_presence_count, members: d.approximate_member_count } });
         }
       });
 

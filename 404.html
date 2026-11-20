@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>404 - Jules</title>
+
+  <!-- Preconnects & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Noto+Sans+JP:wght@400;500;600&family=Shippori+Mincho:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v4 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'IBM Plex Sans', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+      --font-serif: 'Newsreader', 'Shippori Mincho', Georgia, serif;
+      --font-mono: 'IBM Plex Mono', 'Noto Sans JP', ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    :root {
+      color-scheme: dark;
+      --bg-base: #09090a;
+      --text-strong: #f7f4ee;
+      --text-primary: #eae4da;
+      --text-body: #c9c3b9;
+      --text-muted: #989288;
+      --accent-gradient: linear-gradient(90deg, #5e6eb8 0%, #8696dc 26%, #ebeaf2 54%, #f2dfa0 80%, #d9b96b 100%);
+      --accent-gold: #e8cf86;
+      --hairline-gold: linear-gradient(
+        90deg,
+        rgba(232, 207, 134, 0) 0%,
+        rgba(232, 207, 134, 0.24) 16%,
+        rgba(232, 207, 134, 0.24) 84%,
+        rgba(232, 207, 134, 0) 100%
+      );
+      --selection-bg: #2a2826;
+      --selection-text: #f7f4ee;
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    html { font-size: 16px; }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      font-optical-sizing: auto;
+    }
+
+    ::selection {
+      background-color: var(--selection-bg);
+      color: var(--selection-text);
+    }
+
+    html, body {
+      min-height: 100%;
+      background-color: var(--bg-base);
+      color: var(--text-body);
+      font-family: var(--font-sans);
+      letter-spacing: -0.005em;
+    }
+
+    [data-href] { cursor: pointer; }
+
+    /* Local bg.png Background Layer */
+    #bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0;
+      transition: opacity 0.6s var(--ease-out-expo);
+    }
+    #bg-layer.loaded { opacity: 1; }
+
+    #bg-scrim {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background-color: rgba(10, 9, 10, 0.72);
+      opacity: 0;
+      transition: opacity 0.6s var(--ease-out-expo);
+    }
+    #bg-scrim.loaded { opacity: 1; }
+
+    #page-shell {
+      position: relative;
+      z-index: 2;
+    }
+
+    .heading-fancy {
+      font-family: var(--font-serif);
+      font-weight: 400;
+      letter-spacing: -0.015em;
+    }
+
+    .t-strong { color: var(--text-strong); }
+    .t-body { color: var(--text-body); }
+    .t-muted { color: var(--text-muted); }
+
+    /* Unified Fading Antique-Gold Hairline */
+    .hairline-top { position: relative; }
+    .hairline-top::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--hairline-gold);
+      pointer-events: none;
+    }
+
+    .hairline-bottom { position: relative; }
+    .hairline-bottom::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--hairline-gold);
+      pointer-events: none;
+    }
+
+    /* Bohemian Editorial Link */
+    .boho-link {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 4px 5px;
+      font-size: 0.92rem;
+      color: #ebe6dc;
+      transition: color 0.2s ease, background-color 0.22s ease;
+      border-radius: 5px;
+    }
+
+    .boho-link::before {
+      content: '';
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      bottom: 0;
+      height: 1px;
+      background-color: rgba(232, 207, 134, 0.22);
+      pointer-events: none;
+    }
+
+    .boho-link::after {
+      content: '';
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      bottom: 0;
+      height: 1px;
+      background: var(--accent-gradient);
+      transform: scaleX(0);
+      transform-origin: left center;
+      pointer-events: none;
+      transition: transform 0.34s var(--ease-out-expo);
+    }
+
+    .boho-link:hover {
+      background-color: rgba(235, 226, 210, 0.06);
+      color: #faf7f0;
+    }
+
+    .boho-link:hover::after {
+      transform: scaleX(1);
+    }
+
+    /* Custom Bottom-Right Link Preview */
+    #link-preview {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.15rem;
+      z-index: 9400;
+      max-width: min(360px, calc(100vw - 2.5rem));
+      padding: 0.34rem 0.72rem 0.38rem;
+      border-radius: 6px;
+      border: 1px solid rgba(232, 207, 134, 0.22);
+      background-color: rgba(12, 11, 12, 0.88);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate3d(0, 6px, 0);
+      transition: opacity 0.22s var(--ease-out-expo), transform 0.26s var(--ease-out-expo);
+    }
+
+    #link-preview::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1.5px;
+      background: var(--accent-gradient);
+      opacity: 0.9;
+    }
+
+    #link-preview.visible {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+
+    @keyframes fadeEnter {
+      0% { opacity: 0; transform: translate3d(0, 10px, 0); }
+      100% { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      animation: fadeEnter 0.55s var(--ease-out-expo) forwards;
+    }
+    .d-1 { animation-delay: 0.02s; }
+    .d-2 { animation-delay: 0.08s; }
+    .d-3 { animation-delay: 0.14s; }
+  </style>
+</head>
+
+<body class="font-sans text-[1rem] leading-[1.72]">
+
+  <div id="bg-layer" aria-hidden="true"></div>
+  <div id="bg-scrim" aria-hidden="true"></div>
+  <div id="link-preview" aria-hidden="true"></div>
+
+  <div id="page-shell" class="min-h-[100dvh] w-full flex flex-col px-5 py-10 sm:px-6">
+    <main class="w-full max-w-[46ch] mx-auto my-auto">
+
+      <div class="hairline-bottom pb-4 reveal d-1">
+        <div class="flex items-baseline justify-between gap-3">
+          <div class="flex items-baseline gap-3">
+            <h1 class="heading-fancy t-strong text-[2.6rem] leading-none">404</h1>
+            <span class="text-[0.62rem] select-none" style="color: var(--accent-gold);">&#9670;</span>
+            <span class="heading-fancy t-muted text-[1.08rem]" lang="ja">見つかりませんでした</span>
+          </div>
+          <span class="font-mono text-[0.76rem] t-muted">not found</span>
+        </div>
+      </div>
+
+      <div class="pt-4 space-y-3 reveal d-2">
+        <p class="t-body">
+          This page doesn't exist or may have been moved.
+        </p>
+
+        <div id="missing-path" class="font-mono text-[0.82rem] t-muted truncate"></div>
+
+        <div class="pt-2 flex items-center gap-5">
+          <span role="link" tabindex="0" data-href="/" class="boho-link outline-none">
+            <span>&larr;</span>
+            <span>back home</span>
+          </span>
+
+          <button
+            id="go-back-btn"
+            type="button"
+            style="display: none;"
+            class="boho-link cursor-pointer outline-none"
+          >
+            <span>go back</span>
+          </button>
+        </div>
+      </div>
+
+      <footer class="hairline-top mt-8 pt-4 flex items-center justify-between reveal d-3">
+        <span class="font-mono text-[0.82rem] t-muted">rot.kim</span>
+        <span class="font-mono text-[0.78rem] t-muted">HTTP 404</span>
+      </footer>
+
+    </main>
+  </div>
+
+  <script>
+    // Load /bg.png (with local file:// fallback to ./bg.png)
+    (() => {
+      const layer = document.getElementById('bg-layer');
+      const scrim = document.getElementById('bg-scrim');
+      const primarySrc = window.location.protocol === 'file:' ? './bg.png' : '/bg.png';
+
+      const loadBg = (src, fallback) => {
+        const img = new Image();
+        img.onload = () => {
+          layer.style.backgroundImage = `url("${src}")`;
+          layer.classList.add('loaded');
+          scrim.classList.add('loaded');
+        };
+        img.onerror = () => {
+          if (fallback) loadBg(fallback, '');
+        };
+        img.src = src;
+      };
+      loadBg(primarySrc, './bg.png');
+    })();
+
+    // Display the requested path cleanly
+    const pathEl = document.getElementById('missing-path');
+    if (pathEl && window.location.pathname) {
+      let decoded = window.location.pathname;
+      try { decoded = decodeURIComponent(decoded); } catch (_) {}
+      pathEl.textContent = decoded;
+    }
+
+    // Show "go back" button only if visitor came from another page on this site
+    const backBtn = document.getElementById('go-back-btn');
+    if (backBtn && document.referrer) {
+      try {
+        if (new URL(document.referrer).origin === window.location.origin) {
+          backBtn.style.display = 'inline-flex';
+          backBtn.addEventListener('click', () => history.back());
+        }
+      } catch (_) {}
+    }
+
+    // Custom bottom-right link preview & safe navigation
+    const previewEl = document.getElementById('link-preview');
+    const navigate = (href, newTab = false) => {
+      if (!href) return;
+      if (newTab) window.open(href, '_blank', 'noopener,noreferrer');
+      else window.location.href = href;
+    };
+
+    document.addEventListener('pointerover', (e) => {
+      const el = e.target.closest?.('[data-href]');
+      if (!el || !previewEl) return;
+      const href = el.getAttribute('data-href');
+      previewEl.textContent = href === '/' ? `${window.location.host || 'rot.kim'}/` : href;
+      previewEl.classList.add('visible');
+    });
+
+    document.addEventListener('pointerout', (e) => {
+      if (!e.relatedTarget?.closest?.('[data-href]')) {
+        previewEl?.classList.remove('visible');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const el = e.target.closest?.('[data-href]');
+      if (el) navigate(el.getAttribute('data-href'), e.metaKey || e.ctrlKey);
+    });
+
+    document.addEventListener('auxclick', (e) => {
+      if (e.button !== 1) return;
+      const el = e.target.closest?.('[data-href]');
+      if (el) {
+        e.preventDefault();
+        navigate(el.getAttribute('data-href'), true);
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      const el = e.target.closest?.('[data-href]');
+      if (el) navigate(el.getAttribute('data-href'), false);
+    });
+  </script>
+</body>
+</html>

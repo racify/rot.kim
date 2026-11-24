@@ -1987,7 +1987,7 @@
                     </div>
                   </div>
 
-                  <div role="link" tabindex="0" data-href="https://rot.kim" class="interactive-row project-row">
+                  <div role="link" tabindex="0" data-href="https://gothgirls.lol" class="interactive-row project-row">
                     <span class="thumb-box sq-9">
                       <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="36" height="36" decoding="async" alt="" class="sync-avatar-icon" />
                     </span>
@@ -2001,7 +2001,7 @@
                           </svg>
                         </span>
                       </div>
-                      <p class="project-desc t-muted truncate">rot.kim へリダイレクト</p>
+                      <p class="project-desc t-muted truncate">ドメイン・gothgirls.lol</p>
                     </div>
                   </div>
                 </div>
@@ -4155,6 +4155,40 @@
       projects: document.getElementById('panel-projects')
     };
 
+    function getTabFromHash() {
+      const raw = window.location.hash.replace(/^#\/?/, '').trim().toLowerCase();
+      return tabOrder.includes(raw) ? raw : null;
+    }
+
+    function syncTabHash(tab, push = true) {
+      const targetHash = `#${tab}`;
+      if (window.location.hash === targetHash) return;
+      try {
+        if (push) history.pushState(null, '', targetHash);
+        else history.replaceState(null, '', targetHash);
+      } catch (_) {
+        window.location.hash = targetHash;
+      }
+    }
+
+    function applyTabDOM(nextTab, animate = true) {
+      currentTab = nextTab;
+      if (tabActiveLabel) tabActiveLabel.textContent = tabLabels[nextTab];
+      Object.entries(panels).forEach(([key, panel]) => {
+        if (!panel) return;
+        if (key === nextTab) {
+          panel.classList.remove('is-hidden-panel', 'tab-animate');
+          if (animate) {
+            void panel.offsetWidth;
+            panel.classList.add('tab-animate');
+          }
+        } else {
+          panel.classList.add('is-hidden-panel');
+          panel.classList.remove('tab-animate');
+        }
+      });
+    }
+
     function renderTabChoices() {
       if (!tabOptionsInner) return;
       tabOptionsInner.innerHTML = tabOrder
@@ -4177,30 +4211,36 @@
       tabTriggerBtn?.setAttribute('aria-expanded', open ? 'true' : 'false');
     }
 
-    function selectTab(nextTab) {
+    function selectTab(nextTab, { updateHash = true, animate = true } = {}) {
       setTabMenuOpen(false);
-      if (!nextTab || nextTab === currentTab || !panels[nextTab]) return;
-      currentTab = nextTab;
+      if (!nextTab || !panels[nextTab]) return;
+      if (updateHash) syncTabHash(nextTab, true);
+      if (nextTab === currentTab) return;
+
+      if (!animate) {
+        applyTabDOM(nextTab, false);
+        return;
+      }
 
       animateContainerHeight(
         document.getElementById('panels-viewport'),
         document.getElementById('panels-inner'),
-        () => {
-          if (tabActiveLabel) tabActiveLabel.textContent = tabLabels[nextTab];
-          Object.entries(panels).forEach(([key, panel]) => {
-            if (!panel) return;
-            if (key === nextTab) {
-              panel.classList.remove('is-hidden-panel', 'tab-animate');
-              void panel.offsetWidth;
-              panel.classList.add('tab-animate');
-            } else {
-              panel.classList.add('is-hidden-panel');
-              panel.classList.remove('tab-animate');
-            }
-          });
-        }
+        () => applyTabDOM(nextTab, true)
       );
     }
+
+    (() => {
+      const initialTab = getTabFromHash() || 'music';
+      applyTabDOM(initialTab, false);
+      syncTabHash(initialTab, false);
+    })();
+
+    window.addEventListener('hashchange', () => {
+      const hashTab = getTabFromHash();
+      if (hashTab && hashTab !== currentTab) {
+        selectTab(hashTab, { updateHash: false, animate: true });
+      }
+    });
 
     tabTriggerBtn?.addEventListener('click', (e) => {
       e.stopPropagation();

@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="dark" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Jules</title>
-  <meta name="description" content="Jules" />
+  <meta name="description" content="Jules — 土木工学を専攻中。めったにオンラインになりません。" />
   <link id="dynamic-favicon" rel="icon" type="image/png" href="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
 
   <link rel="preconnect" href="https://api.lanyard.rest" crossorigin>
@@ -22,7 +22,6 @@
   <link rel="dns-prefetch" href="https://lrclib.net">
   <link rel="dns-prefetch" href="https://discord.com">
 
-  <!-- Prefetch APIs, cached avatar & setup icons before fonts load -->
   <script>
     (() => {
       const CFG = {
@@ -59,7 +58,6 @@
         }
       } catch (_) {}
 
-      // Preload & decode setup icons once into HTTP + RAM cache
       window.__ICONS_READY = Promise.all(CFG.ICON_DOMAINS.map((domain) => new Promise((resolve) => {
         const img = new Image();
         img.decoding = 'async';
@@ -198,7 +196,7 @@
 
     html.is-hidden * { animation-play-state: paused !important; }
 
-    /* NASA Voyager Golden Record intro (compositor-only, zero drop-shadow repaints) */
+    /* Voyager Golden Record intro */
     #intro-overlay {
       position: fixed;
       inset: 0;
@@ -303,7 +301,7 @@
       }
     }
 
-    /* Clean, cute star cursor (zero-repaint GPU composited) */
+    /* Star cursor */
     html.has-custom-cursor,
     html.has-custom-cursor * {
       cursor: none !important;
@@ -414,7 +412,7 @@
     #bg-layer.loaded,
     #bg-scrim.loaded { opacity: 1; }
 
-    /* Rare ambient twinkling white dots */
+    /* Ambient twinkling white dots */
     #ambient-stars {
       position: fixed;
       inset: 0;
@@ -526,7 +524,7 @@
     .hairline-top::before { top: 0; }
     .hairline-bottom::after { bottom: 0; }
 
-    /* Header */
+    /* Header & Bio */
     .profile-header { margin-bottom: 0.25rem; }
 
     .header-row {
@@ -645,7 +643,14 @@
       object-fit: contain;
     }
 
-    /* Floating lyrics (pure transform + opacity, zero filter repaints) */
+    .profile-bio {
+      margin-top: 0.65rem;
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: var(--text-body);
+    }
+
+    /* Floating lyrics */
     #lyrics-stage {
       position: fixed;
       inset: 0;
@@ -968,7 +973,7 @@
     html.intro-done .d-2 { animation-delay: 0.1s; }
     html.intro-done .d-3 { animation-delay: 0.16s; }
 
-    /* Smoothly collapsible activity stack */
+    /* Collapsible activity stack */
     #activity-widget-wrap {
       height: 0;
       margin-top: 0;
@@ -1125,7 +1130,6 @@
       user-select: none;
     }
 
-    /* Minimal spinning disc */
     .music-disc-wrap {
       position: relative;
       flex-shrink: 0;
@@ -1189,7 +1193,7 @@
       to { transform: rotate(360deg); }
     }
 
-    /* GPU-composited starry song progress bar */
+    /* Starry song progress bar */
     .song-progress-rail {
       position: relative;
       margin-top: 0.72rem;
@@ -1483,7 +1487,7 @@
       gap: 1.25rem;
     }
 
-    .setup-heading { margin-bottom: 0.7rem; }
+    .section-heading { margin-bottom: 0.7rem; }
 
     .setup-row {
       display: flex;
@@ -1561,8 +1565,14 @@
       opacity: 1;
     }
 
-    /* Projects panel */
+    /* Projects panel (separated into サイト & サーバー) */
     #panel-projects {
+      display: flex;
+      flex-direction: column;
+      gap: 1.35rem;
+    }
+
+    .projects-group {
       display: flex;
       flex-direction: column;
       gap: 0.375rem;
@@ -1852,6 +1862,8 @@
             </div>
           </div>
         </div>
+
+        <p class="profile-bio t-muted">土木工学を勉強中。めったにオンラインになりません。</p>
       </header>
 
       <main>
@@ -1916,7 +1928,7 @@
               <!-- Setup -->
               <div id="panel-setup" class="is-hidden-panel">
                 <div>
-                  <h2 class="heading-fancy t-strong panel-title setup-heading">使用アプリ</h2>
+                  <h2 class="heading-fancy t-strong panel-title section-heading">使用アプリ</h2>
 
                   <div class="setup-row">
                     <span class="heading-fancy t-muted setup-label">普段使い:</span>
@@ -1940,7 +1952,7 @@
                 </div>
 
                 <div>
-                  <h2 class="heading-fancy t-strong panel-title setup-heading">OS</h2>
+                  <h2 class="heading-fancy t-strong panel-title section-heading">OS</h2>
 
                   <div class="setup-row">
                     <span class="heading-fancy t-muted setup-label">現在:</span>
@@ -1952,51 +1964,77 @@
                 </div>
               </div>
 
-              <!-- Projects -->
+              <!-- Projects: separated into サイト and サーバー -->
               <div id="panel-projects" class="is-hidden-panel">
-                <div role="link" tabindex="0" data-href="https://rot.kim" class="interactive-row project-row">
-                  <span class="thumb-box sq-9">
-                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="36" height="36" decoding="async" alt="" class="sync-avatar-icon" />
-                  </span>
+                <div class="projects-group">
+                  <h2 class="heading-fancy t-strong panel-title section-heading">サイト</h2>
 
-                  <div class="project-meta">
-                    <div class="project-head">
-                      <span id="project-site-title" class="heading-fancy t-strong project-name">Jules</span>
-                      <span class="pin-icon" aria-label="ピン留めされたプロジェクト">
-                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                          <path d="M8.5 3.5a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v1.2l-1.1 1.1v4.4l2.1 2.1a1 1 0 0 1-.7 1.7H13v6.5l-1 1.5-1-1.5V14H8.2a1 1 0 0 1-.7-1.7l2.1-2.1V5.8L8.5 4.7V3.5Z"/>
-                        </svg>
-                      </span>
+                  <div role="link" tabindex="0" data-href="https://rot.kim" class="interactive-row project-row">
+                    <span class="thumb-box sq-9">
+                      <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="36" height="36" decoding="async" alt="" class="sync-avatar-icon" />
+                    </span>
+
+                    <div class="project-meta">
+                      <div class="project-head">
+                        <span id="project-site-title" class="heading-fancy t-strong project-name">Jules</span>
+                        <span class="pin-icon" aria-label="ピン留め">
+                          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M8.5 3.5a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v1.2l-1.1 1.1v4.4l2.1 2.1a1 1 0 0 1-.7 1.7H13v6.5l-1 1.5-1-1.5V14H8.2a1 1 0 0 1-.7-1.7l2.1-2.1V5.8L8.5 4.7V3.5Z"/>
+                          </svg>
+                        </span>
+                      </div>
+                      <p class="project-desc t-muted truncate">個人サイト・rot.kim</p>
                     </div>
-                    <p class="project-desc t-muted truncate">個人サイト・rot.kim</p>
+                  </div>
+
+                  <div role="link" tabindex="0" data-href="https://rot.kim" class="interactive-row project-row">
+                    <span class="thumb-box sq-9">
+                      <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="36" height="36" decoding="async" alt="" class="sync-avatar-icon" />
+                    </span>
+
+                    <div class="project-meta">
+                      <div class="project-head">
+                        <span class="heading-fancy t-strong project-name">gothgirls.lol</span>
+                        <span class="pin-icon" aria-label="ピン留め">
+                          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M8.5 3.5a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v1.2l-1.1 1.1v4.4l2.1 2.1a1 1 0 0 1-.7 1.7H13v6.5l-1 1.5-1-1.5V14H8.2a1 1 0 0 1-.7-1.7l2.1-2.1V5.8L8.5 4.7V3.5Z"/>
+                          </svg>
+                        </span>
+                      </div>
+                      <p class="project-desc t-muted truncate">rot.kim へリダイレクト</p>
+                    </div>
                   </div>
                 </div>
 
-                <div role="link" tabindex="0" data-href="https://discord.gg/rKZGYvmUUC" class="interactive-row project-row">
-                  <span class="thumb-box sq-9">
-                    <img id="server-one-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="36" height="36" decoding="async" alt="" />
-                  </span>
+                <div class="projects-group">
+                  <h2 class="heading-fancy t-strong panel-title section-heading">サーバー</h2>
 
-                  <div class="project-meta">
-                    <div class="project-head is-server">
-                      <span id="server-one-name" class="heading-fancy t-strong project-name">discord</span>
-                      <span id="server-one-members" class="server-members t-muted tabular">... 人</span>
+                  <div role="link" tabindex="0" data-href="https://discord.gg/rKZGYvmUUC" class="interactive-row project-row">
+                    <span class="thumb-box sq-9">
+                      <img id="server-one-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="36" height="36" decoding="async" alt="" />
+                    </span>
+
+                    <div class="project-meta">
+                      <div class="project-head is-server">
+                        <span id="server-one-name" class="heading-fancy t-strong project-name">discord</span>
+                        <span id="server-one-members" class="server-members t-muted tabular">... 人</span>
+                      </div>
+                      <p id="server-one-desc" class="project-desc t-muted truncate"></p>
                     </div>
-                    <p id="server-one-desc" class="project-desc t-muted truncate"></p>
                   </div>
-                </div>
 
-                <div role="link" tabindex="0" data-href="https://discord.gg/zZf4RAP6Gq" class="interactive-row project-row">
-                  <span class="thumb-box sq-9">
-                    <img id="server-two-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="36" height="36" decoding="async" alt="" />
-                  </span>
+                  <div role="link" tabindex="0" data-href="https://discord.gg/zZf4RAP6Gq" class="interactive-row project-row">
+                    <span class="thumb-box sq-9">
+                      <img id="server-two-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="36" height="36" decoding="async" alt="" />
+                    </span>
 
-                  <div class="project-meta">
-                    <div class="project-head is-server">
-                      <span id="server-two-name" class="heading-fancy t-strong project-name">discord</span>
-                      <span id="server-two-members" class="server-members t-muted tabular">... 人</span>
+                    <div class="project-meta">
+                      <div class="project-head is-server">
+                        <span id="server-two-name" class="heading-fancy t-strong project-name">discord</span>
+                        <span id="server-two-members" class="server-members t-muted tabular">... 人</span>
+                      </div>
+                      <p id="server-two-desc" class="project-desc t-muted truncate"></p>
                     </div>
-                    <p id="server-two-desc" class="project-desc t-muted truncate"></p>
                   </div>
                 </div>
               </div>
@@ -2110,7 +2148,6 @@
       }
     }
 
-    // Voyager Golden Record intro & star dissolve
     function loadBackgroundImage(sources) {
       const list = Array.isArray(sources) ? sources : [sources];
       const layer = document.getElementById('bg-layer');
@@ -2200,7 +2237,6 @@
       Promise.race([Promise.all([bgPromise, fontsReady, iconsReady, minSpin]), maxWait]).then(finish);
     }
 
-    // Sparse ambient twinkling white dots
     (function initAmbientStars() {
       const stage = document.getElementById('ambient-stars');
       if (!stage || REDUCED_MOTION.matches) return;
@@ -2239,7 +2275,6 @@
       }
     })();
 
-    // Clean, cute star cursor (zero-lag positioning, cached hover target, rAF only while spinning)
     (function initStarCursor() {
       const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
       const cursorEl = document.getElementById('custom-cursor');
@@ -2334,7 +2369,6 @@
       window.addEventListener('blur', hideCursor);
     })();
 
-    // Bottom-right link preview & [data-href] navigation
     const linkPreviewEl = document.getElementById('link-preview');
     let activePreviewTarget = null;
     let previewToastTimer = null;
@@ -2423,7 +2457,6 @@
       openExternalUrl(target.getAttribute('data-href'));
     });
 
-    // Custom right-click menu (Shift + Right-click opens native menu)
     const ctxMenuEl = document.getElementById('context-menu');
 
     function closeContextMenu() {
@@ -2538,7 +2571,6 @@
     window.addEventListener('resize', closeContextMenu, { passive: true });
     window.addEventListener('blur', closeContextMenu);
 
-    // Cache & rate-limited JSON fetch
     const memoryCache = new Map();
     const inFlightRequests = new Map();
     const hostBlockedUntil = new Map();
@@ -2698,7 +2730,6 @@
       });
     }
 
-    // Music platform detection
     let activeMusicApp = null;
 
     function detectAppFromActivity(act) {
@@ -2771,7 +2802,6 @@
       }
     }
 
-    // Floating lyrics (LRCLIB)
     const LYRICS_STORE_KEY = 'rot_lyrics_v2';
     let lyricsStore = {};
     try {
@@ -3166,7 +3196,6 @@
       }
     }
 
-    // Artwork & duration fallback (Deezer / iTunes JSONP)
     const ART_STORE_KEY = 'rot_art_meta_v2';
     let persistedTrackMeta = {};
     try {
@@ -3268,7 +3297,6 @@
       return task;
     }
 
-    // Profile, presence & playback state
     let lastAvatarUrl = '';
     let discordSpotifyActive = null;
     let discordMusicRpcActive = null;
@@ -3492,7 +3520,6 @@
       if (imgEl.complete && imgEl.naturalWidth > 0) show();
     }
 
-    // Keyed activity DOM builder (keeps spinning disc intact)
     const activityNodeMap = new Map();
     let activityHeightTimer = null;
     let activityRafId = null;
@@ -3901,7 +3928,6 @@
       connectLanyardWs();
     }
 
-    // stats.fm
     function extractStatsFmTrack(rawTrack, platform) {
       if (!rawTrack) return null;
       const artists = Array.isArray(rawTrack.artists)
@@ -4114,7 +4140,6 @@
       fetchStatsFm();
     });
 
-    // Tab picker
     const tabLabels = { music: '音楽', setup: '環境', projects: '制作' };
     const tabOrder = ['music', 'setup', 'projects'];
     let currentTab = 'music';
@@ -4189,7 +4214,6 @@
       }
     });
 
-    // Discord invites
     const discordServers = [
       { code: 'rKZGYvmUUC', nameId: 'server-one-name', membersId: 'server-one-members', descId: 'server-one-desc', iconId: 'server-one-icon' },
       { code: 'zZf4RAP6Gq', nameId: 'server-two-name', membersId: 'server-two-members', descId: 'server-two-desc', iconId: 'server-two-icon' }
